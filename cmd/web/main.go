@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"real-time-forum/internal/handlers"
 	"real-time-forum/internal/routes"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {

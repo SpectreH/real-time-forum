@@ -21,16 +21,16 @@ const routes = [
         </div>
         <div class="w-100 d-grid gap-4">
           <div class="d-flex justify-content-center">
-            <form class="login-form d-grid gap-3 w-50 needs-validation" method="post" novalidate>
+            <form class="login-form d-grid gap-3 w-50 needs-validation" action="/login-post" method="post" novalidate>
               <h1>Login</h1>
               <div class="form-group">
-                <label for="email-login">Username/Email address</label>
-                <input type="text" class="form-control" id="email-login" aria-describedby="emailHelp"
+                <label for="login">Username/Email address</label>
+                <input name="login" type="text" class="form-control" id="login" aria-describedby="emailHelp"
                   placeholder="Enter username/email" required>
               </div>
               <div class="form-group">
                 <label for="password-login">Password</label>
-                <input type="password" class="form-control" id="password-login" placeholder="Password" autocomplete required>
+                <input name="password" type="password" class="form-control" id="password-login" placeholder="Password" autocomplete required>
               </div>
               <div>
                 <button type="submit" class="btn btn-primary w-25">Submit</button>
@@ -57,19 +57,19 @@ const routes = [
         </div>
         <div class="w-100 d-grid gap-4">
           <div class="d-flex justify-content-center">
-            <form class="login-form d-grid gap-3 w-50 needs-validation" method="post" novalidate>
+            <form class="login-form d-grid gap-3 w-50 needs-validation" action="/registration-post" method="post" novalidate>
               <h1>Signup</h1>
               <div class="form-group row">
                 <div class="col">
                   <label for="name-reg">Name</label>
-                  <input type="text" class="form-control" placeholder="First name" required>
+                  <input name="firstName" type="text" class="form-control" placeholder="First name" required>
                   <div class="invalid-feedback">
                     Please provide your name.
                   </div>
                 </div>
                 <div class="col">
                   <label for="surname-reg">Surname</label>
-                  <input type="text" class="form-control" placeholder="Last name" required>
+                  <input name="lastName" type="text" class="form-control" placeholder="Last name" required>
                   <div class="invalid-feedback">
                     Please provide your surname.
                   </div>
@@ -78,7 +78,7 @@ const routes = [
               <div class="form-group">
                 <div class="col">
                   <label for="gender-reg">Gender</label>
-                  <select id="gender-reg" class="form-control" required>
+                  <select name="gender" id="gender-reg" class="form-control" required>
                     <option value="" disabled selected>Your gender</option>
                     <option value="male" >Male</option>
                     <option value="female" >Female</option>
@@ -90,14 +90,14 @@ const routes = [
               </div>
               <div class="form-group">
                 <label for="age-reg">Age</label>
-                <input min="18" max="120" type="number" class="form-control" id="age-reg" aria-describedby="ageHelp" placeholder="Age" required>
+                <input name="age" min="18" max="120" type="number" class="form-control" id="age-reg" aria-describedby="ageHelp" placeholder="Age" required>
                 <div class="invalid-feedback">
                   You must be at least 18 years old.
                 </div>
               </div>
               <div class="form-group">
                 <label for="username-reg">Username</label>
-                <input minlength="5" type="text" class="form-control" id="username-reg" aria-describedby="usernameHelp"
+                <input name="username" minlength="5" type="text" class="form-control" id="username-reg" aria-describedby="usernameHelp"
                   placeholder="Username" required>
                 <div class="invalid-feedback">
                   Please select your username.
@@ -105,22 +105,14 @@ const routes = [
               </div>
               <div class="form-group">
                 <label for="email-reg">Email address</label>
-                <input minlength="5" type="email" class="form-control" id="email-reg" aria-describedby="emailHelp" placeholder="Email" required>
+                <input name="email" minlength="5" type="email" class="form-control" id="email-reg" aria-describedby="emailHelp" placeholder="Email" required>
                 <div class="invalid-feedback">
                   Please provide your email address.
                 </div>
               </div>
               <div class="form-group">
                 <label for="password-reg">Password</label>
-                <input minlength="8" type="password" class="form-control" id="password-reg" placeholder="Password" autocomplete required>
-                <div class="invalid-feedback">
-                  Password min lenght must be 8.
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="confirm-password-reg">Confirm Password</label>
-                <input minlength="8" type="password" class="form-control" id="confirm-password-reg" placeholder="Confirm password"
-                  autocomplete required>
+                <input name="password" minlength="8" type="password" class="form-control" id="password-reg" placeholder="Password" autocomplete required>
                 <div class="invalid-feedback">
                   Password min lenght must be 8.
                 </div>

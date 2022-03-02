@@ -2,8 +2,12 @@ package handlers
 
 import (
 	"database/sql"
+	"net/http"
 	"real-time-forum/internal/repository"
 	"real-time-forum/internal/repository/dbrepo"
+	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 // Repository is the repository type (Repository pattern)
@@ -24,4 +28,39 @@ var Repo *Repository
 // SetNewHandlers sets the repository for the handlers
 func SetNewHandlers(r *Repository) {
 	Repo = r
+}
+
+// createSessionToken creates token for cookies and database
+func createSessionToken(w http.ResponseWriter) string {
+	sessionToken := uuid.NewV4().String()
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: time.Now().Add(1200 * time.Second),
+	})
+
+	return sessionToken
+}
+
+// checkForCookies checks if cookies exists in the database
+func checkForCookies(r *http.Request, w http.ResponseWriter) bool {
+	c, err := r.Cookie("session_token")
+
+	if err == nil {
+		res, err := Repo.DB.CheckSessionExistence(c.Value)
+
+		if res != 0 && err == nil {
+			return true
+		}
+
+		c := http.Cookie{
+			Name:   "session_token",
+			MaxAge: -1}
+		http.SetCookie(w, &c)
+
+		return false
+	}
+
+	return false
 }
