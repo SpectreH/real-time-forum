@@ -30,6 +30,13 @@ func SetNewHandlers(r *Repository) {
 	Repo = r
 }
 
+// Favicon is the handler for the favicon
+func (m *Repository) Favicon(w http.ResponseWriter, r *http.Request) {
+
+}
+
+var possibleRoutes []string = []string{"/", "/login", "/registration"}
+
 // createSessionToken creates token for cookies and database
 func createSessionToken(w http.ResponseWriter) string {
 	sessionToken := uuid.NewV4().String()

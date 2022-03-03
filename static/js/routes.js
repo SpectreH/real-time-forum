@@ -1,13 +1,13 @@
 const routes = [
   {
     path: '/',
-    template: `
+    getTemplate: (params) => `
     
     `
   },
   {
     path: '/login',
-    template: `
+    getTemplate: (params) => `
       <section id="login-section" class="m-auto d-flex align-items-center text-center login-section">
         <div class="w-100 d-flex justify-content-center">
           <div class="w-50 d-grid gap-4">
@@ -43,7 +43,7 @@ const routes = [
   },
   {
     path: '/registration',
-    template: `
+    getTemplate: (params) => `
       <section id="reg-section" class="m-auto d-flex align-items-center text-center login-section">
         <div class="w-100 d-flex justify-content-center">
           <div class="w-50 d-grid gap-4">

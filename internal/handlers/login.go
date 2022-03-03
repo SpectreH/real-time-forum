@@ -42,7 +42,6 @@ func (m *Repository) PostLogin(w http.ResponseWriter, r *http.Request) {
 				err := m.DB.UpdateSessionToken(createSessionToken(w), id)
 
 				if err != nil {
-					log.Println(err)
 					http.Redirect(w, r, "/login", http.StatusFound)
 					return
 				}

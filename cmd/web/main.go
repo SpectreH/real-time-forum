@@ -19,7 +19,7 @@ func main() {
 	handlers.SetNewHandlers(handlersRepo)
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":8000",
 		Handler: routes.SetRoutes(),
 	}
 

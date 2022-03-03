@@ -78,7 +78,7 @@ func (m *sqliteDBRepo) CheckSessionExistence(token string) (int, error) {
 // UpdateSessionToken updates token to a new one for user
 func (m *sqliteDBRepo) UpdateSessionToken(token string, id int) error {
 	query := `update users set session_token = $1 where id = $2`
-	err := m.DB.QueryRow(query, &token, &id).Err()
+	_, err := m.DB.Exec(query, &token, &id)
 	if err != nil {
 		return err
 	}
