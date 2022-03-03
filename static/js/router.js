@@ -1,12 +1,33 @@
 class Router {
   constructor(routes) {
     this.routes = routes;
-    this._loadInitialRoute();
+    this.authRes;
   }
 
-  loadRoute(...urlSegments) {
+  async initialize() {
+    await this.cookieValidation()
+    await this._loadInitialRoute();
+  }
+
+  static async create(routes) {
+    const o = new Router(routes);
+    await o.initialize();
+    return o;
+  }
+
+  async loadRoute(...urlSegments) {
     // Get the template for the given route.
-    const matchedRoute = this._matchUrlToRoute(urlSegments);
+    let matchedRoute = this._matchUrlToRoute(urlSegments);
+
+    if (this.authRes) {
+      if (matchedRoute.path == "/login" || matchedRoute.path == "/registration") {
+        matchedRoute =  this._matchUrlToRoute([""]);
+      }
+    } else {
+      if (matchedRoute.path != "/login" && matchedRoute.path != "/registration") {
+        matchedRoute = this._matchUrlToRoute(["login"]);
+      }
+    }
 
     // Push a history entry with the new url.
     // We pass an empty object and an empty string as the historyState and title arguments, but their values do not really matter here.
@@ -56,17 +77,17 @@ class Router {
     return { ...matchedRoute, params: routeParams };
   }
 
-  _loadInitialRoute() {
+  async _loadInitialRoute() {
     // Figure out the path segments for the route which should load initially.
     const pathnameSplit = window.location.pathname.split('/');
     const pathSegments = pathnameSplit.length > 1 ? pathnameSplit.slice(1) : '';
     // Load the initial route.
-    this.loadRoute(...pathSegments);
+    await this.loadRoute(...pathSegments);
   }
 
-  cookieValidation() {
-    fetch('/cookie-validation', { method: "post" }).then(res => res.json()).then(res => {
-      return res.ok
+  async cookieValidation() {
+    await fetch('/cookie-validation', { method: "post" }).then(res => res.json()).then(res => {
+      this.authRes = res.ok
     })
   }
 

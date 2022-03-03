@@ -2,7 +2,58 @@ const routes = [
   {
     path: '/',
     getTemplate: (params) => `
-    
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Real time forum</a>
+        <button class="navbar-toggler p-0 border-0" type="button" id="navbarSideCollapse" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-collapse offcanvas-collapse">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">New post</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-section container">
+      <div class="row gap-2">
+        <div class="col-7 my-3 p-3 bg-body rounded shadow-sm">
+          <h6 class="border-bottom pb-2 mb-0">Posts</h6>
+          <div class="align-items-center d-flex text-muted">
+            <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg"
+              role="img" aria-label="Placeholder: 32x32" preserveAspectRatio="xMidYMid slice" focusable="false">
+              <title>Placeholder</title>
+              <rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
+            </svg>
+        
+            <a href="test" class="post-conclusion pb-3 pt-3 mb-0 small lh-sm border-bottom w-100">
+              <div class="d-flex justify-content-between">
+                <strong class="text-gray-dark">Test message for all users</strong>
+              </div>
+              <span class="mt-2 d-block">Author: Queryu</span>
+              <span class="d-block">Created: 28.03.2012 12:35</span>
+              <span class="d-block">Categories: Sport, Music, Hello</span>
+            </a>
+          </div>
+        </div>
+        <div class="col-4 my-3 p-3 bg-body rounded shadow-sm">
+          <h6 class="border-bottom pb-2 mb-0">Chat</h6>
+          <div id="chat">
+
+          </div>
+        </div>
+      </div>
+    </main>
     `
   },
   {

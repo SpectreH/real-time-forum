@@ -1,1 +1,4 @@
-const router = new Router(routes);
+var router;
+(async function () {
+  router = await Router.create(routes)
+})();
