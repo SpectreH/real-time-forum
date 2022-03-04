@@ -77,6 +77,11 @@ header button {
   padding-top: 56px;
 }
 
+#user-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 @media (max-width: 991.98px) {
   .offcanvas-collapse {
     position: fixed;
