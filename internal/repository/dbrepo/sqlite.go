@@ -22,6 +22,35 @@ func (m *sqliteDBRepo) InsertUser(user models.User) (int, error) {
 	return userID, nil
 }
 
+// InsertPost inserts a new post into database
+func (m *sqliteDBRepo) InsertPost(post models.Post) (int, error) {
+	var postId int
+
+	query := `insert into posts (author_id, title, body, created, comments) values ($1, $2, $3, $4, $5) returning id;`
+	row := m.DB.QueryRow(query, &post.AuthorID, &post.Title, &post.Body, &post.Created, &post.Comments)
+	err := row.Scan(&postId)
+
+	if err != nil {
+		return -1, err
+	}
+
+	return postId, nil
+}
+
+// InsertPostCategory inserts all new post categories into database
+func (m *sqliteDBRepo) InsertPostCategory(categories []string, postId int) error {
+	for _, category := range categories {
+		query := `INSERT INTO post_categories (post_id, category) VALUES ($1, (SELECT id FROM categories WHERE category = $2));`
+		_, err := m.DB.Exec(query, &postId, &category)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // CheckUsernameExistence checks if username is already taken
 func (m *sqliteDBRepo) CheckUsernameExistence(username string) (int, error) {
 	var id int

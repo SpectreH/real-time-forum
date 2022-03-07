@@ -5,6 +5,8 @@ import "real-time-forum/internal/models"
 // DatabaseRepo holds functions for database interaction
 type DatabaseRepo interface {
 	InsertUser(user models.User) (int, error)
+	InsertPost(post models.Post) (int, error)
+	InsertPostCategory(categories []string, postId int) error
 	CheckUsernameExistence(username string) (int, error)
 	CheckEmailExistence(email string) (int, error)
 	CheckSessionExistence(token string) (int, error)

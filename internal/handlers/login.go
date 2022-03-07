@@ -61,7 +61,9 @@ func (m *Repository) PostLogin(w http.ResponseWriter, r *http.Request) {
 
 // Logout is the handler for logging out
 func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
-	if checkForCookies(r, w) {
+	_, res := checkForCookies(r, w)
+
+	if res {
 		c := http.Cookie{
 			Name:   "session_token",
 			MaxAge: -1}
