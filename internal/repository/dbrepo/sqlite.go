@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"database/sql"
+	"log"
 	"real-time-forum/internal/models"
 	"time"
 )
@@ -84,6 +85,29 @@ func (m *sqliteDBRepo) UpdateSessionToken(token string, id int) error {
 	}
 
 	return nil
+}
+
+func (m *sqliteDBRepo) GetAllCategories() ([]string, error) {
+	var result []string
+
+	sqlStmt := "SELECT category FROM categories"
+	rows, err := m.DB.Query(sqlStmt)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var category string
+
+		err := rows.Scan(&category)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result = append(result, category)
+	}
+
+	return result, nil
 }
 
 // GetUserHash gets user's password hash for further compare

@@ -16,6 +16,10 @@ func SetRoutes() http.Handler {
 	mux.HandleFunc("/login-post", handlers.Repo.PostLogin)
 	mux.HandleFunc("/cookie-validation", handlers.Repo.PostCookieValidation)
 
+	mux.HandleFunc("/categories-post", handlers.Repo.PostCategories)
+
+	mux.HandleFunc("/logout", handlers.Repo.Logout)
+
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 

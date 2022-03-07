@@ -16,6 +16,7 @@ class Router {
   }
 
   async loadRoute(...urlSegments) {
+    await this.cookieValidation()
     // Get the template for the given route.
     let matchedRoute = this._matchUrlToRoute(urlSegments);
 
@@ -34,9 +35,21 @@ class Router {
     const url = `/${urlSegments.join('/')}`;
     history.pushState({}, '', url);
 
-    // Append the given template to the DOM inside the router outlet.
-    const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
-    routerOutletElement.innerHTML = matchedRoute.getTemplate(matchedRoute.params);
+    if (this.authRes) {
+      const mainRouterElement = this._matchUrlToRoute([""]);
+
+      const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
+      routerOutletElement.innerHTML =  await mainRouterElement.getTemplate(mainRouterElement.params);
+
+      if (matchedRoute.path != '/') {
+        let mainInnerHTMLRouter = routerOutletElement.querySelectorAll('[auth-data-router-outlet]')[0];
+        mainInnerHTMLRouter.innerHTML = await matchedRoute.getTemplate(matchedRoute.params);
+      } 
+    } else {
+      // Append the given template to the DOM inside the router outlet.
+      const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
+      routerOutletElement.innerHTML =  await matchedRoute.getTemplate(matchedRoute.params);
+    }
 
     this.formValidation();
   }

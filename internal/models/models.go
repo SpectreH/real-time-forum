@@ -48,3 +48,9 @@ type PostCategory struct {
 	PostID     int
 	CategoryID int
 }
+
+type JsonResponse struct {
+	OK      bool     `json:"ok"`
+	Message string   `json:"message"`
+	Data    []string `json:"data"`
+}

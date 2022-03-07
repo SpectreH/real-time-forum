@@ -29,6 +29,7 @@ header button {
   color: #6c757d!important;
 }
 
+
 .nav-scroller {
   position: relative;
   z-index: 2;
@@ -69,7 +70,20 @@ header button {
 }
 
 .category-box {
+  margin: 5px;
   width: 200px;
+  height: 200px;
+  text-decoration: none!important;
+  color: var(--bs-body-color);
+}
+
+.new-post-text-content {
+  resize: none;
+  height: 300px;
+}
+
+.new-comment-text-content {
+  resize: none;
   height: 200px;
 }
 

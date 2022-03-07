@@ -35,7 +35,7 @@ func (m *Repository) Favicon(w http.ResponseWriter, r *http.Request) {
 
 }
 
-var possibleRoutes []string = []string{"/", "/login", "/registration"}
+var possibleRoutes []string = []string{"/", "/login", "/logout", "/registration", "/category", "/new"}
 
 // createSessionToken creates token for cookies and database
 func createSessionToken(w http.ResponseWriter) string {
