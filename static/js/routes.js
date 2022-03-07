@@ -128,39 +128,54 @@ const routes = [
     
       var checkboxes = htmlElement.querySelector("#category-selection-list").querySelectorAll('input[type="checkbox"]');
 
-      console.log(checkboxes)
-
       return htmlElement.innerHTML
     }
   },
   {
     path: '/category/:category',
-    getTemplate: (params) => {
-    return  `
-    <div class="border-bottom pb-2 mb-0 d-flex">
-      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
-        <h6 class="a-link-style">Categories</h6>
-      </a>
-      <h6 class="">&nbsp> ${params.category}</h6>
-    </div>
-    <div class="align-items-center d-flex text-muted">
-      <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
-        xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32"
-        preserveAspectRatio="xMidYMid slice" focusable="false">
-        <title>Placeholder</title>
-        <rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
-      </svg>
+    getTemplate: async (params) => {
+      let htmlElement = document.createElement('div')
+      htmlElement.innerHTML = `
+      <div class="border-bottom pb-2 mb-0 d-flex">
+        <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
+          <h6 class="a-link-style">Categories</h6>
+        </a>
+        <h6 class="">&nbsp> ${params.category}</h6>
+      </div>
+      <div id="post-list">
+      </div>
+      `
 
-      <a href="JavaScript:void(0);"  onclick="router.loadRoute('category', '${params.category}', '1')" class="post-conclusion pb-3 pt-3 mb-0 small lh-sm border-bottom w-100">
-        <div class="d-flex justify-content-between">
-          <strong class="text-gray-dark">Test message for all users</strong>
-        </div>
-        <span class="mt-2 d-block">Author: Queryu</span>
-        <span class="d-block">Created: 28.03.2012 12:35</span>
-        <span class="d-block">Categories: Sport, Music, Hello</span>
-      </a>
-    </div>
-    `}
+      let newFormData = new FormData
+      newFormData.append("category", params.category)
+
+      await fetch('/get-post-list', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
+        let postList = htmlElement.querySelector("#post-list")
+
+        res.forEach(post => {
+          postList.innerHTML += `
+            <div class="align-items-center d-flex text-muted">
+              <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
+                xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32"
+                preserveAspectRatio="xMidYMid slice" focusable="false">
+                <title>Placeholder</title>
+                <rect width="100%" height="100%" fill="#007bff" /><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text>
+              </svg>
+              <a href="JavaScript:void(0);"  onclick="router.loadRoute('category', '${params.category}', '${post.id}')" class="post-conclusion pb-3 pt-3 mb-0 small lh-sm border-bottom w-100">
+                <div class="d-flex justify-content-between">
+                  <strong class="text-gray-dark">${post.title}</strong>
+                </div>
+                <span class="mt-2 d-block">Author: ${post.authorName}</span>
+                <span class="d-block">Created: ${post.created}</span>
+                <span class="d-block">Categories: Sport, Music, Hello</span>
+              </a>
+            </div>
+            `
+        })
+      })
+
+      return htmlElement.innerHTML
+    }
   },
   {
     path: '/category/:category/:postId',

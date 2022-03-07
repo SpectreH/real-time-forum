@@ -18,13 +18,15 @@ type User struct {
 
 // Post is the post model
 type Post struct {
-	ID         int
-	AuthorID   int
-	Title      string
-	Body       string
-	Created    string
-	Comments   int
-	Categories []string
+	ID           int           `json:"id"`
+	AuthorID     int           `json:"authorId"`
+	AuthorName   string        `json:"authorName"`
+	Title        string        `json:"title"`
+	Body         string        `json:"body"`
+	Created      string        `json:"created"`
+	Comments     int           `json:"comments"`
+	Categories   []string      `json:"categories"`
+	PostComments []PostComment `json:"postComments"`
 }
 
 // Category is the post category model
@@ -39,7 +41,7 @@ type PostComment struct {
 	PostID    int
 	AuthorID  int
 	Body      []string
-	CreatedAt time.Time
+	CreatedAt string
 }
 
 // PostCategory is the post category model

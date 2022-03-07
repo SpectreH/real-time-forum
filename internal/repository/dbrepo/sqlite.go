@@ -116,6 +116,7 @@ func (m *sqliteDBRepo) UpdateSessionToken(token string, id int) error {
 	return nil
 }
 
+// GetAllCategories get all existing categories for main and new post page
 func (m *sqliteDBRepo) GetAllCategories() ([]string, error) {
 	var result []string
 
@@ -134,6 +135,31 @@ func (m *sqliteDBRepo) GetAllCategories() ([]string, error) {
 		}
 
 		result = append(result, category)
+	}
+
+	return result, nil
+}
+
+// GetPostList gets all posts in certain category
+func (m *sqliteDBRepo) GetPostList(category string) ([]models.Post, error) {
+	_ = "SELECT p.id, p.title, p.body, p.created, p.comments, u.username FROM posts AS p, users AS u WHERE p.id = 7;"
+	result := []models.Post{}
+
+	sqlStmt := "SELECT p.id, p.title, p.created, u.username, u.id FROM posts AS p, users AS u, post_categories as pc WHERE pc.category = (SELECT id FROM categories WHERE category = $1);"
+	rows, err := m.DB.Query(sqlStmt, &category)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var post models.Post
+
+		err := rows.Scan(&post.ID, &post.Title, &post.Created, &post.AuthorName, &post.AuthorID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result = append(result, post)
 	}
 
 	return result, nil

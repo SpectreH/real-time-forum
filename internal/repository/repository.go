@@ -12,5 +12,6 @@ type DatabaseRepo interface {
 	CheckSessionExistence(token string) (int, error)
 	UpdateSessionToken(token string, id int) error
 	GetAllCategories() ([]string, error)
+	GetPostList(category string) ([]models.Post, error)
 	GetUserHash(id int) (string, error)
 }
