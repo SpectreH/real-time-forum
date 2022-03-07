@@ -113,6 +113,26 @@ class Router {
     // Loop over them and prevent submission
     Array.prototype.slice.call(forms).forEach(function (form) {
       form.addEventListener('submit', function (event) {
+        let categorySelection = document.getElementById("category-selection-list")
+        if (categorySelection) {
+          let inputs = categorySelection.querySelectorAll("input");
+          let atLeastOneCheck = false; 
+
+          inputs.forEach(input => {
+            if (input.checked) {
+              atLeastOneCheck = true;
+            }
+          });
+
+          inputs.forEach(input => {
+            if (atLeastOneCheck) {
+              input.required = false;
+            } else {
+              input.required = true;
+            }
+          });
+        }
+
         if (!form.checkValidity()) {
           event.preventDefault()
           event.stopPropagation()

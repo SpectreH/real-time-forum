@@ -19,9 +19,9 @@ type User struct {
 // Post is the post model
 type Post struct {
 	ID         int
-	AuthorID   string
+	AuthorID   int
 	Title      string
-	Body       []string
+	Body       string
 	Created    string
 	Comments   int
 	Categories []string

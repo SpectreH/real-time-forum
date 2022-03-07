@@ -24,11 +24,15 @@ header button {
   animation-fill-mode: forwards;
 }
 
-.post-conclusion  {
+.post-conclusion, .a-link-style  {
   text-decoration: none!important;
   color: #6c757d!important;
 }
 
+.a-link-style {
+  text-decoration: none!important;
+  color: var(--bs-body-color)!important;
+}
 
 .nav-scroller {
   position: relative;
@@ -85,6 +89,11 @@ header button {
 .new-comment-text-content {
   resize: none;
   height: 200px;
+}
+
+.new-post-category-selection {
+  height: 75px;
+  overflow-y: auto;
 }
 
 .main-section {

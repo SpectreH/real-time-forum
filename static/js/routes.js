@@ -30,7 +30,9 @@ const routes = [
       <main class="main-section container">
         <div class="row gap-2">
           <div class="col-9 my-3 p-3 bg-body rounded shadow-sm" auth-data-router-outlet>
-            <h6 class="border-bottom pb-2 mb-2">Categories</h6>
+            <div class="border-bottom pb-2 mb-0 d-flex">
+              <h6 class="">Categories</h6>
+            </div>
             <div class="text-center" id="category-list">
             </div>
           </div>
@@ -83,29 +85,64 @@ const routes = [
   },
   {
     path: '/new',
-    getTemplate: (params) => `
-    <h6 class="border-bottom pb-2 mb-2">New Post</h6>
-    <form class="d-inline needs-validation" action="" enctype="multipart/form-data" method="post" novalidate>
-      <div class="d-grid gap-4">
-        <div class="input-group">
-          <input type="text" class="form-control" aria-label="New post header" placeholder="New post header" required>
-        </div>
-        <div class="input-group">
-          <textarea class="new-post-text-content form-control" aria-label="New post content"
-            placeholder="New post content" required></textarea>
-        </div>
-        <div>
-          <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
-        </div>
+    getTemplate: async (params) => {
+      let htmlElement = document.createElement('div')
+      htmlElement.innerHTML = `
+      <div class="border-bottom pb-2 mb-2 mb-0 d-flex">
+        <h6 class="">New Post</h6>
       </div>
-    </form>
-    `
+      <form class="d-inline needs-validation" action="/new-post" method="post" novalidate>
+        <div class="d-grid gap-4">
+          <div class="input-group">
+            <input type="text" class="form-control" name="title" aria-label="New post header" placeholder="New post header" required>
+          </div>
+          <div class="input-group">
+            <textarea class="new-post-text-content form-control" name="new-content" aria-label="New post content" placeholder="New post content"
+              required></textarea>
+          </div>
+          <div class="d-grid required">
+            <h6 class="mb-2">Select category:</h6>
+            <div class="new-post-category-selection p-1" id="category-selection-list">
+            </div>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
+          </div>
+        </div>
+      </form>
+      `
+      
+      await fetch('/categories-post', { method: "post" }).then(res => res.json()).then(res => {
+        if (res.ok) {
+          res.data.forEach(category => {
+            let categoryList = htmlElement.querySelector("#category-selection-list")
+
+            categoryList.innerHTML += `
+              <div class="form-check d-flex gap-2">
+                <input class="form-check-input" type="checkbox" name="category" value="${category}">${category}</input>
+              </div>
+              `
+          });
+        }
+      })
+    
+      var checkboxes = htmlElement.querySelector("#category-selection-list").querySelectorAll('input[type="checkbox"]');
+
+      console.log(checkboxes)
+
+      return htmlElement.innerHTML
+    }
   },
   {
     path: '/category/:category',
     getTemplate: (params) => {
     return  `
-    <h6 class="border-bottom pb-2 mb-0">Posts</h6>
+    <div class="border-bottom pb-2 mb-0 d-flex">
+      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
+        <h6 class="a-link-style">Categories</h6>
+      </a>
+      <h6 class="">&nbsp> ${params.category}</h6>
+    </div>
     <div class="align-items-center d-flex text-muted">
       <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: 32x32"
@@ -128,7 +165,16 @@ const routes = [
   {
     path: '/category/:category/:postId',
     getTemplate: (params) => `
-    <h3 class="border-bottom pb-2 mb-2">Test message for all users</h6>
+    <div class="border-bottom pb-2 mb-0 d-flex">
+      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
+        <h6 class="a-link-style">Categories</h6>
+      </a>
+      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('category', '${params.category}')">
+        <h6 class="a-link-style">&nbsp> ${params.category}</h6>
+      </a>
+      <h6 class="">&nbsp> Test message for all users</h6>
+    </div>
+    <h3 class="border-bottom pt-2 pb-2 mb-2">Test message for all users</h6>
     <div class="d-flex justify-content-between">
       <span class="d-block">Author: Queryu</span>
       <span class="d-block">Created: 28.03.2012 12:35</span>
