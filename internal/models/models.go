@@ -23,7 +23,8 @@ type Post struct {
 	AuthorName   string        `json:"authorName"`
 	Title        string        `json:"title"`
 	Body         string        `json:"body"`
-	Created      string        `json:"created"`
+	Paragraphs   []string      `json:"paragraphs"`
+	Created      time.Time     `json:"created"`
 	Comments     int           `json:"comments"`
 	Categories   []string      `json:"categories"`
 	PostComments []PostComment `json:"postComments"`

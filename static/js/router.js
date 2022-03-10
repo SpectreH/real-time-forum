@@ -34,12 +34,14 @@ class Router {
     // We pass an empty object and an empty string as the historyState and title arguments, but their values do not really matter here.
     const url = `/${urlSegments.join('/')}`;
     history.pushState({}, '', url);
+    
+    const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
 
     if (this.authRes) {
-      const mainRouterElement = this._matchUrlToRoute([""]);
-
-      const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
-      routerOutletElement.innerHTML =  await mainRouterElement.getTemplate(mainRouterElement.params);
+      if (!routerOutletElement.querySelectorAll('[auth-data-router-outlet]')[0] || matchedRoute.path == '/') {
+        const mainRouterElement = this._matchUrlToRoute([""]);
+        routerOutletElement.innerHTML = await mainRouterElement.getTemplate(mainRouterElement.params);
+      }
 
       if (matchedRoute.path != '/') {
         let mainInnerHTMLRouter = routerOutletElement.querySelectorAll('[auth-data-router-outlet]')[0];
@@ -50,6 +52,8 @@ class Router {
       const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
       routerOutletElement.innerHTML =  await matchedRoute.getTemplate(matchedRoute.params);
     }
+
+    routerOutletElement.classList.remove("hide")
 
     this.formValidation();
   }

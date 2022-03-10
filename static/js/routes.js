@@ -140,7 +140,7 @@ const routes = [
         <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
           <h6 class="a-link-style">Categories</h6>
         </a>
-        <h6 class="">&nbsp> ${params.category}</h6>
+        <h6 class="">&nbsp>${params.category}</h6>
       </div>
       <div id="post-list">
       </div>
@@ -152,7 +152,13 @@ const routes = [
       await fetch('/get-post-list', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
         let postList = htmlElement.querySelector("#post-list")
 
+        if (res.length == 0) {
+          postList.innerHTML += `<h3 class="text-center">There are no posts in this category</h3>`
+        }
+
         res.forEach(post => {
+          const postedTime = getTime(post.created);
+
           postList.innerHTML += `
             <div class="align-items-center d-flex text-muted">
               <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
@@ -166,8 +172,8 @@ const routes = [
                   <strong class="text-gray-dark">${post.title}</strong>
                 </div>
                 <span class="mt-2 d-block">Author: ${post.authorName}</span>
-                <span class="d-block">Created: ${post.created}</span>
-                <span class="d-block">Categories: Sport, Music, Hello</span>
+                <span class="d-block">Created: ${postedTime}</span>
+                <span class="d-block">Categories: ${post.categories.join(", ")}</span>
               </a>
             </div>
             `
@@ -179,91 +185,71 @@ const routes = [
   },
   {
     path: '/category/:category/:postId',
-    getTemplate: (params) => `
-    <div class="border-bottom pb-2 mb-0 d-flex">
-      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
-        <h6 class="a-link-style">Categories</h6>
-      </a>
-      <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('category', '${params.category}')">
-        <h6 class="a-link-style">&nbsp> ${params.category}</h6>
-      </a>
-      <h6 class="">&nbsp> Test message for all users</h6>
-    </div>
-    <h3 class="border-bottom pt-2 pb-2 mb-2">Test message for all users</h6>
-    <div class="d-flex justify-content-between">
-      <span class="d-block">Author: Queryu</span>
-      <span class="d-block">Created: 28.03.2012 12:35</span>
-      <span class="d-block">Categories: Sport, Music, Hello</span>
-    </div>
-    <div class="mb-4 mt-4">
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis arcu risus, quis posuere dui pretium vitae.
-        Morbi at elit condimentum, finibus eros quis, porta turpis. Pellentesque et molestie nisi, vel commodo nulla. Nunc
-        dapibus elit sed tellus pulvinar rutrum. Curabitur lorem lectus, congue quis orci eget, pulvinar blandit tortor.
-        Suspendisse potenti. Phasellus mollis ut odio ac tincidunt. Mauris quis mauris ac dui elementum fermentum. Aliquam risus
-        diam, lacinia vel ullamcorper ut, blandit ac enim. Sed id enim nec mi accumsan facilisis. Aenean eu nisi ipsum. Aenean
-        sit amet mauris aliquet, hendrerit diam quis, facilisis urna. Sed sagittis felis eu tortor vestibulum, non commodo erat
-        sodales.
-      </p>
-      <p>
-        Maecenas pretium ipsum ac quam rhoncus sodales. Nam maximus turpis leo, at blandit massa commodo sit amet. Etiam lacinia
-        ligula non dui ullamcorper, eu finibus eros elementum. Nam at mauris eget massa consequat molestie. Curabitur non leo
-        sit amet mauris blandit maximus non sed diam. Orci varius natoque penatibus et magnis dis parturient montes, nascetur
-        ridiculus mus. In blandit tellus orci, eu sodales enim venenatis sit amet. Duis ac volutpat odio. Donec ornare molestie
-        felis a tempus. Etiam vitae aliquet nunc. Phasellus feugiat mollis eros, eu porttitor felis feugiat at. Nullam vitae
-        interdum ex. Integer porttitor nisl a ipsum tincidunt, at imperdiet magna interdum. Nulla ac pretium tellus, sed luctus
-        augue. Phasellus eu nulla at mi accumsan lacinia eget vitae ex. Pellentesque eu nisi nec mauris imperdiet bibendum nec
-        vel purus.
-      </p>
-      <p>
-        Mauris pharetra, dui malesuada pretium tincidunt, ipsum eros ornare nulla, vel blandit lorem augue non tortor. Curabitur
-        sodales ullamcorper tempus. Quisque sit amet arcu lorem. Vivamus finibus leo ligula, quis gravida felis euismod et.
-        Mauris nec nunc vel urna accumsan placerat nec nec ligula. Nullam imperdiet metus sed purus congue, in accumsan purus
-        mollis. Cras vitae placerat nisi. Sed finibus aliquam sem, a auctor sapien feugiat eget. Sed porta tincidunt metus a
-        suscipit. Aenean eu eros ut sem mattis consequat eget id nisi.
-      </p>
-      <p>
-        Integer eros mi, porttitor quis hendrerit et, volutpat sed leo. Integer nec bibendum urna. In rhoncus maximus velit, vel
-        condimentum lacus fringilla at. Phasellus tristique mattis neque non maximus. Pellentesque habitant morbi tristique
-        senectus et netus et malesuada fames ac turpis egestas. Cras at dictum nunc. Cras consequat egestas sapien a ultricies.
-      </p>
-      <p>
-        Curabitur eleifend eu lorem ut mollis. Ut vitae nisl ac ex euismod cursus. Nulla convallis urna vitae accumsan
-        tincidunt. Mauris gravida orci non nisl elementum, ut mattis arcu suscipit. Cras finibus tristique interdum.
-        Pellentesque quis ipsum dictum, aliquam justo ac, pharetra purus. Donec ullamcorper pulvinar nibh at auctor. Sed
-        sollicitudin venenatis tellus a placerat. Aliquam a dolor rutrum, molestie magna eu, varius magna. Curabitur egestas
-        purus placerat arcu luctus sollicitudin. In hac habitasse platea dictumst. Maecenas tempor tortor turpis, vel interdum
-        elit hendrerit non. Aliquam leo augue, facilisis in congue ut, malesuada sit amet nunc. Nam eget blandit nibh, a
-        sollicitudin est.
-      </p>
-    </div>
-    <h3 class="border-bottom pb-2 mb-2">Comments</h6>
-    <form class="d-inline needs-validation" action="" enctype="multipart/form-data" method="post" novalidate>
-      <div class="d-grid gap-4">
-        <div class="input-group">
-          <textarea class="new-comment-text-content form-control" aria-label="New comment content" placeholder="New comment content"
-            required></textarea>
-        </div>
-        <div>
-          <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
-        </div>
-      </div>
-    </form>
-    <div class="d-grid gap-3 mb-3 mt-3 p-2 bg-body rounded border border-secondary">
-      <div class="d-flex border-bottom justify-content-between">
-        <h6 class="d-block">Author: Queryu</h6>
-        <h6 class="d-block">Created: 28.03.2012 12:36</h5>
-      </div>
-      <div class="p-2">
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis arcu risus, quis posuere dui pretium
-          vitae.
-          Morbi at elit condimentum, finibus eros quis, porta turpis. Pellentesque et molestie nisi, vel commodo nulla. Nunc
-          dapibus elit sed tellus pulvinar rutrum. Curabitur lorem lectus, congue quis orci eget, pulvinar blandit tortor.
-        </p>
-      </div>
-    </div>
-    `
+    getTemplate: async (params) => {
+      let htmlElement = document.createElement("div")
+      let formData = new FormData()
+      formData.append("postId", params.postId)
+
+      await fetch('/get-post', { method: "post", body: formData }).then(res => res.json()).then(res => {
+        if (res.ok != undefined) {
+          htmlElement.innerHTML = `<h3 class="text-center">This post doesn't exist!</h3>`
+        } else {
+          htmlElement.innerHTML = `
+          <div class="border-bottom pb-2 mb-0 d-flex">
+            <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
+              <h6 class="a-link-style">Categories</h6>
+            </a>
+            <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('category', '${params.category}')">
+              <h6 class="a-link-style">&nbsp> ${params.category}</h6>
+            </a>
+            <h6 class="">&nbsp> ${res.title}</h6>
+          </div>
+          <h3 class="border-bottom pt-2 pb-2 mb-2">${res.title}</h6>
+          <div class="d-flex justify-content-between">
+            <span class="d-block">Author: ${res.authorName}</span>
+            <span class="d-block">Created: ${getTime(res.created)}</span>
+            <span class="d-block">Categories: ${res.categories.join(", ")}</span>
+          </div>
+          <div class="mb-4 mt-4" id="post-text-body">
+          </div>
+          <h3 class="border-bottom pb-2 mb-2">Comments</h6>
+          <form class="d-inline needs-validation" action="" enctype="multipart/form-data" method="post" novalidate>
+            <div class="d-grid gap-4">
+              <div class="input-group">
+                <textarea class="new-comment-text-content form-control" aria-label="New comment content" placeholder="New comment content"
+                  required></textarea>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary" style="width: 100px;">Submit</button>
+              </div>
+            </div>
+          </form>
+          <div class="d-grid gap-3 mb-3 mt-3 p-2 bg-body rounded border border-secondary">
+            <div class="d-flex border-bottom justify-content-between">
+              <h6 class="d-block">Author: Queryu</h6>
+              <h6 class="d-block">Created: 28.03.2012 12:36</h5>
+            </div>
+            <div class="p-2">
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis arcu risus, quis posuere dui pretium
+                vitae.
+                Morbi at elit condimentum, finibus eros quis, porta turpis. Pellentesque et molestie nisi, vel commodo nulla. Nunc
+                dapibus elit sed tellus pulvinar rutrum. Curabitur lorem lectus, congue quis orci eget, pulvinar blandit tortor.
+              </p>
+            </div>
+          </div>
+          `
+          let postBody = htmlElement.querySelector("#post-text-body")
+          res.paragraphs.forEach(paragraph => {
+            postBody.innerHTML += `
+            <p>${paragraph}</p>
+            `
+          })        
+        }
+      })
+
+      return htmlElement.innerHTML
+    }
   },
   {
     path: '/login',
@@ -387,3 +373,11 @@ const routes = [
     `,
   },
 ];
+
+function getTime(givenTime) {
+  const cutTime = givenTime.substring(0, 16)
+  const [date, time] = cutTime.split("T");
+  const [year, month, day] = date.split("-");
+
+  return `${day}.${month}.${year} ${time}`
+}

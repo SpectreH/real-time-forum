@@ -13,5 +13,7 @@ type DatabaseRepo interface {
 	UpdateSessionToken(token string, id int) error
 	GetAllCategories() ([]string, error)
 	GetPostList(category string) ([]models.Post, error)
+	GetPostCategories(postID int) ([]string, error)
+	GetPost(postId int) (models.Post, error)
 	GetUserHash(id int) (string, error)
 }

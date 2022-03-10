@@ -18,11 +18,12 @@ func SetRoutes() http.Handler {
 	mux.HandleFunc("/categories-post", handlers.Repo.PostCategories)
 	mux.HandleFunc("/new-post", handlers.Repo.NewPost)
 	mux.HandleFunc("/get-post-list", handlers.Repo.GetPostList)
+	mux.HandleFunc("/get-post", handlers.Repo.GetPost)
 
 	mux.HandleFunc("/cookie-validation", handlers.Repo.PostCookieValidation)
 	mux.HandleFunc("/logout", handlers.Repo.Logout)
 
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.Dir("static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	return mux

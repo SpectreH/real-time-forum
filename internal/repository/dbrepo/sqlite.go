@@ -2,8 +2,8 @@ package dbrepo
 
 import (
 	"database/sql"
-	"log"
 	"real-time-forum/internal/models"
+	"real-time-forum/pkg/helpers"
 	"time"
 )
 
@@ -131,7 +131,31 @@ func (m *sqliteDBRepo) GetAllCategories() ([]string, error) {
 
 		err := rows.Scan(&category)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
+		}
+
+		result = append(result, category)
+	}
+
+	return result, nil
+}
+
+// GetPostCategories gets all categories of ceration post
+func (m *sqliteDBRepo) GetPostCategories(postID int) ([]string, error) {
+	var result []string
+
+	sqlStmt := "SELECT c.category FROM post_categories AS pc LEFT JOIN categories AS c ON pc.category = c.id WHERE pc.post_id = $1;"
+	rows, err := m.DB.Query(sqlStmt, postID)
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var category string
+
+		err := rows.Scan(&category)
+		if err != nil {
+			return nil, err
 		}
 
 		result = append(result, category)
@@ -142,10 +166,15 @@ func (m *sqliteDBRepo) GetAllCategories() ([]string, error) {
 
 // GetPostList gets all posts in certain category
 func (m *sqliteDBRepo) GetPostList(category string) ([]models.Post, error) {
-	_ = "SELECT p.id, p.title, p.body, p.created, p.comments, u.username FROM posts AS p, users AS u WHERE p.id = 7;"
 	result := []models.Post{}
 
-	sqlStmt := "SELECT p.id, p.title, p.created, u.username, u.id FROM posts AS p, users AS u, post_categories as pc WHERE pc.category = (SELECT id FROM categories WHERE category = $1);"
+	sqlStmt := `
+	SELECT p.id, p.title, p.created, u.username, u.id 
+	FROM post_categories AS pc 
+	LEFT JOIN posts AS p ON pc.post_id = p.id 
+	LEFT JOIN users AS u ON p.author_id = u.id 
+	WHERE pc.category = (SELECT id FROM categories WHERE category = $1);`
+
 	rows, err := m.DB.Query(sqlStmt, &category)
 	if err != nil {
 		return result, err
@@ -156,13 +185,42 @@ func (m *sqliteDBRepo) GetPostList(category string) ([]models.Post, error) {
 
 		err := rows.Scan(&post.ID, &post.Title, &post.Created, &post.AuthorName, &post.AuthorID)
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
+		}
+
+		post.Categories, err = m.GetPostCategories(post.ID)
+		if err != nil {
+			return nil, err
 		}
 
 		result = append(result, post)
 	}
 
 	return result, nil
+}
+
+// GetPost gets the certain post's full data
+func (m *sqliteDBRepo) GetPost(postId int) (models.Post, error) {
+	post := models.Post{}
+
+	query := `SELECT p.id, p.title, p.body, p.created, p.comments, u.username, u.id FROM posts AS p, users AS u WHERE p.id = $1;`
+	row := m.DB.QueryRow(query, postId)
+	err := row.Scan(&post.ID, &post.Title, &post.Body, &post.Created, &post.Comments, &post.AuthorName, &post.AuthorID)
+	if err != nil {
+		return post, err
+	}
+
+	post.Categories, err = m.GetPostCategories(postId)
+	if err != nil {
+		return post, err
+	}
+
+	post.Paragraphs, err = helpers.DivideBodyIntoParagraphs(post.Body)
+	if err != nil {
+		return post, err
+	}
+
+	return post, nil
 }
 
 // GetUserHash gets user's password hash for further compare
