@@ -114,6 +114,8 @@ func (m *Repository) NewPost(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/new", http.StatusFound)
 			return
 		}
+
+		models.GlobalData.Flash = "New post successfully created!"
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)

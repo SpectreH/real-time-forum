@@ -5,17 +5,11 @@ const routes = [
       let htmlElement = document.createElement('div')
       htmlElement.innerHTML = `
       <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
-        <div class="container-fluid">
+        <div class="container-fluid justify-content-start">
           <a class="navbar-brand" href="JavaScript:void(0);"  onclick="router.loadRoute('')">Real time forum</a>
-          <button class="navbar-toggler p-0 border-0" type="button" id="navbarSideCollapse" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
       
-          <div class="navbar-collapse offcanvas-collapse">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="JavaScript:void(0);"  onclick="router.loadRoute('')">Home</a>
-              </li>
+          <div class="d-flex ">
+            <ul class="navbar-nav me-auto flex-row gap-2">
               <li class="nav-item">
                 <a class="nav-link" href="JavaScript:void(0);" onclick="router.loadRoute('new')">New post</a>
               </li>
@@ -77,6 +71,8 @@ const routes = [
               </a>
               `
           });
+        } else {
+          GenerateAlert("Error with getting category list", "error");
         }
       })
 
@@ -123,10 +119,10 @@ const routes = [
               </div>
               `
           });
+        } else {
+          GenerateAlert("Error with getting category list", "error");
         }
       })
-    
-      var checkboxes = htmlElement.querySelector("#category-selection-list").querySelectorAll('input[type="checkbox"]');
 
       return htmlElement.innerHTML
     }
@@ -140,7 +136,7 @@ const routes = [
         <a class="a-link-style" href="JavaScript:void(0);"  onclick="router.loadRoute('')">
           <h6 class="a-link-style">Categories</h6>
         </a>
-        <h6 class="">&nbsp>${params.category}</h6>
+        <h6 class="">&nbsp>&nbsp${params.category}</h6>
       </div>
       <div id="post-list">
       </div>

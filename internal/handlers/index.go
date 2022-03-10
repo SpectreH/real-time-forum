@@ -1,21 +1,25 @@
 package handlers
 
 import (
+	"html/template"
+	"log"
 	"net/http"
+	"real-time-forum/internal/models"
 )
 
 // Index is the handler for the index html page
 func (m *Repository) Index(w http.ResponseWriter, r *http.Request) {
-	// for i, route := range possibleRoutes {
-	// 	if r.URL.Path == route {
-	// 		break
-	// 	}
+	t, err := template.ParseFiles("index.html")
+	if err != nil {
+		log.Fatal("Error executing template :", err)
+		return
+	}
 
-	// 	if i == len(possibleRoutes)-1 {
-	// 		http.NotFound(w, r)
-	// 		return
-	// 	}
-	// }
+	err = t.Execute(w, models.GlobalData)
+	if err != nil {
+		log.Fatal("Error executing template :", err)
+		return
+	}
 
-	http.ServeFile(w, r, "index.html")
+	models.ClearGlobalData()
 }

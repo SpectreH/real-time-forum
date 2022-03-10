@@ -54,7 +54,6 @@ class Router {
     }
 
     routerOutletElement.classList.remove("hide")
-
     this.formValidation();
   }
 
@@ -109,8 +108,6 @@ class Router {
   }
 
   formValidation() {
-    'use strict'
-
     // Fetch all the forms we want to apply custom Bootstrap validation styles to
     var forms = document.querySelectorAll('.needs-validation')
 
