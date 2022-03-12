@@ -37,6 +37,23 @@ func (m *sqliteDBRepo) InsertPost(post models.Post) (int, error) {
 	return postId, nil
 }
 
+// InsertComment inserts a new comment into database
+func (m *sqliteDBRepo) InsertComment(comment models.PostComment) error {
+	query := `insert into post_comments (post_id, author_id, created, body) values ($1, $2, $3, $4);`
+	_, err := m.DB.Exec(query, &comment.PostID, &comment.AuthorID, &comment.Created, &comment.Body)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.UpdatePostCommentsCounter(comment.PostID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // InsertPostCategory inserts all new post categories into database
 func (m *sqliteDBRepo) InsertPostCategory(categories []string, postId int) error {
 	for _, category := range categories {
@@ -109,6 +126,25 @@ func (m *sqliteDBRepo) CheckSessionExistence(token string) (int, error) {
 func (m *sqliteDBRepo) UpdateSessionToken(token string, id int) error {
 	query := `update users set session_token = $1 where id = $2`
 	_, err := m.DB.Exec(query, &token, &id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdatePostCommentsCounter updates comments counter of certain post with +1
+func (m *sqliteDBRepo) UpdatePostCommentsCounter(postId int) error {
+	var currentCounter int
+	sqlStmt := "SELECT comments FROM posts WHERE id = $1"
+	err := m.DB.QueryRow(sqlStmt, postId).Scan(&currentCounter)
+	if err != nil {
+		return err
+	}
+
+	currentCounter++
+	sqlStmt = "update posts set comments = $1 where id = $2"
+	_, err = m.DB.Exec(sqlStmt, currentCounter, postId)
 	if err != nil {
 		return err
 	}
@@ -203,7 +239,7 @@ func (m *sqliteDBRepo) GetPostList(category string) ([]models.Post, error) {
 func (m *sqliteDBRepo) GetPost(postId int) (models.Post, error) {
 	post := models.Post{}
 
-	query := `SELECT p.id, p.title, p.body, p.created, p.comments, u.username, u.id FROM posts AS p, users AS u WHERE p.id = $1;`
+	query := `SELECT p.id, p.title, p.body, p.created, p.comments, u.username, u.id FROM posts AS p LEFT JOIN users AS u on u.id = p.author_id WHERE p.id = $1;`
 	row := m.DB.QueryRow(query, postId)
 	err := row.Scan(&post.ID, &post.Title, &post.Body, &post.Created, &post.Comments, &post.AuthorName, &post.AuthorID)
 	if err != nil {
@@ -223,6 +259,45 @@ func (m *sqliteDBRepo) GetPost(postId int) (models.Post, error) {
 	return post, nil
 }
 
+// GetPostComments gets all comments of certain post
+func (m *sqliteDBRepo) GetPostComments(postId int) ([]models.PostComment, error) {
+	result := []models.PostComment{}
+
+	sqlStmt := `SELECT pc.id, pc.post_id, pc.author_id, pc.created, pc.body FROM post_comments as pc WHERE pc.post_id = $1;`
+	rows, err := m.DB.Query(sqlStmt, &postId)
+
+	if err == sql.ErrNoRows {
+		return result, nil
+	}
+
+	if err != nil {
+		return result, err
+	}
+
+	for rows.Next() {
+		var comment models.PostComment
+
+		err := rows.Scan(&comment.ID, &comment.PostID, &comment.AuthorID, &comment.Created, &comment.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		comment.Paragraphs, err = helpers.DivideBodyIntoParagraphs(comment.Body)
+		if err != nil {
+			return result, err
+		}
+
+		comment.AuthorName, err = m.GetUserName(comment.AuthorID)
+		if err != nil {
+			return result, err
+		}
+
+		result = append(result, comment)
+	}
+
+	return result, nil
+}
+
 // GetUserHash gets user's password hash for further compare
 func (m *sqliteDBRepo) GetUserHash(id int) (string, error) {
 	var hash string
@@ -234,4 +309,17 @@ func (m *sqliteDBRepo) GetUserHash(id int) (string, error) {
 	}
 
 	return hash, nil
+}
+
+// GetUserName gets user's username by id
+func (m *sqliteDBRepo) GetUserName(id int) (string, error) {
+	var res string
+
+	query := `select username from users where id = $1`
+	err := m.DB.QueryRow(query, &id).Scan(&res)
+	if err != nil {
+		return "", err
+	}
+
+	return res, nil
 }

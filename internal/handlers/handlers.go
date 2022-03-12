@@ -49,14 +49,14 @@ func createSessionToken(w http.ResponseWriter) string {
 }
 
 // checkForCookies checks if cookies exists in the database
-func checkForCookies(r *http.Request, w http.ResponseWriter) (int, bool) {
+func checkForCookies(r *http.Request, w http.ResponseWriter) int {
 	c, err := r.Cookie("session_token")
 
 	if err == nil {
 		res, err := Repo.DB.CheckSessionExistence(c.Value)
 
 		if res != 0 && err == nil {
-			return res, true
+			return res
 		}
 
 		c := http.Cookie{
@@ -64,8 +64,8 @@ func checkForCookies(r *http.Request, w http.ResponseWriter) (int, bool) {
 			MaxAge: -1}
 		http.SetCookie(w, &c)
 
-		return 0, false
+		return 0
 	}
 
-	return 0, false
+	return 0
 }

@@ -17,6 +17,7 @@ func SetRoutes() http.Handler {
 
 	mux.HandleFunc("/categories-post", handlers.Repo.PostCategories)
 	mux.HandleFunc("/new-post", handlers.Repo.NewPost)
+	mux.HandleFunc("/new-comment", handlers.Repo.NewComment)
 	mux.HandleFunc("/get-post-list", handlers.Repo.GetPostList)
 	mux.HandleFunc("/get-post", handlers.Repo.GetPost)
 

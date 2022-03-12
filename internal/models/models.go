@@ -38,11 +38,13 @@ type Category struct {
 
 // PostComment is the post comment model
 type PostComment struct {
-	ID        int
-	PostID    int
-	AuthorID  int
-	Body      []string
-	CreatedAt string
+	ID         int       `json:"id"`
+	PostID     int       `json:"postId"`
+	AuthorID   int       `json:"authorId"`
+	AuthorName string    `json:"authorName"`
+	Body       string    `json:"body"`
+	Paragraphs []string  `json:"paragraphs"`
+	Created    time.Time `json:"created"`
 }
 
 // PostCategory is the post category model

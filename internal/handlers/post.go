@@ -39,6 +39,19 @@ func (m *Repository) GetPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		post.PostComments, err = m.DB.GetPostComments(postId)
+		if err != nil {
+			log.Println(err)
+			resp := models.JsonResponse{
+				OK: false,
+			}
+
+			out, _ := json.MarshalIndent(resp, "", "    ")
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(out)
+			return
+		}
+
 		out, _ := json.MarshalIndent(post, "", "    ")
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(out)
@@ -75,6 +88,45 @@ func (m *Repository) GetPostList(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+// NewPost is the handler for saving new comment
+func (m *Repository) NewComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		authorId := checkForCookies(r, w)
+		if authorId == 0 {
+			models.GlobalData.Error = "You must be logged in to post a comment!"
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		postId, err := strconv.Atoi(r.FormValue("postId"))
+		if err != nil {
+			models.GlobalData.Error = "Error with parsing post id"
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		newComment := models.PostComment{
+			AuthorID: authorId,
+			PostID:   postId,
+			Body:     base64.StdEncoding.EncodeToString([]byte(r.FormValue("comment"))),
+			Created:  time.Now().Local(),
+		}
+
+		err = m.DB.InsertComment(newComment)
+		if err != nil {
+			models.GlobalData.Error = "Error with inserting new comment into database"
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		models.GlobalData.Flash = "Your comment has been successfully submitted!"
+		http.Redirect(w, r, r.Header.Get("Referer"), http.StatusFound)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
 // NewPost is the handler for saving new post
 func (m *Repository) NewPost(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
@@ -85,8 +137,8 @@ func (m *Repository) NewPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		userId, res := checkForCookies(r, w)
-		if !res {
+		userId := checkForCookies(r, w)
+		if userId == 0 {
 			http.Redirect(w, r, "/new", http.StatusFound)
 			return
 		}

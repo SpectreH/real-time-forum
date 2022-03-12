@@ -208,11 +208,12 @@ const routes = [
           </div>
           <div class="mb-4 mt-4" id="post-text-body">
           </div>
-          <h3 class="border-bottom pb-2 mb-2">Comments</h6>
-          <form class="d-inline needs-validation" action="" enctype="multipart/form-data" method="post" novalidate>
+          <h3 class="border-bottom pb-2 mb-2">${res.comments} Comments</h6>
+          <form class="d-inline needs-validation" action="/new-comment" method="post" novalidate>
             <div class="d-grid gap-4">
               <div class="input-group">
-                <textarea class="new-comment-text-content form-control" aria-label="New comment content" placeholder="New comment content"
+                <input name="postId" value="${params.postId}" style="display: none;"></input>
+                <textarea class="new-comment-text-content form-control" name="comment" aria-label="New comment content" placeholder="New comment content"
                   required></textarea>
               </div>
               <div>
@@ -220,31 +221,47 @@ const routes = [
               </div>
             </div>
           </form>
-          <div class="d-grid gap-3 mb-3 mt-3 p-2 bg-body rounded border border-secondary">
-            <div class="d-flex border-bottom justify-content-between">
-              <h6 class="d-block">Author: Queryu</h6>
-              <h6 class="d-block">Created: 28.03.2012 12:36</h5>
-            </div>
-            <div class="p-2">
-              <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis arcu risus, quis posuere dui pretium
-                vitae.
-                Morbi at elit condimentum, finibus eros quis, porta turpis. Pellentesque et molestie nisi, vel commodo nulla. Nunc
-                dapibus elit sed tellus pulvinar rutrum. Curabitur lorem lectus, congue quis orci eget, pulvinar blandit tortor.
-              </p>
-            </div>
+          <div id="comment-section">
           </div>
           `
-          let postBody = htmlElement.querySelector("#post-text-body")
+          let postBody = htmlElement.querySelector("#post-text-body");
           res.paragraphs.forEach(paragraph => {
             postBody.innerHTML += `
             <p>${paragraph}</p>
-            `
-          })        
+            `;
+          })
+          
+          let commentSection = htmlElement.querySelector("#comment-section");
+
+          if (res.postComments.length == 0) {
+            commentSection.innerHTML += `<h3 class="mt-5 text-center">There are no comments yet. Add your comment.</h3>`
+          }
+
+          res.postComments.forEach(comment => {
+            let newComment = document.createElement("div");
+          
+            newComment.innerHTML += `
+              <div class="d-grid gap-3 mb-3 mt-3 p-2 bg-body rounded border border-secondary">
+                <div class="d-flex border-bottom justify-content-between">
+                  <h6 class="d-block">Author: ${comment.authorName}</h6>
+                  <h6 class="d-block">Created: ${getTime(comment.created)}</h5>
+                </div>
+                <div class="p-2" id="comment-body-section"></div>
+              </div>
+            `;
+            let commentBodySection = newComment.querySelector("#comment-body-section")
+            comment.paragraphs.forEach(paragraph => {
+              commentBodySection.innerHTML += `
+              <p>${paragraph}</p>
+              `;
+            })
+
+            commentSection.innerHTML += newComment.innerHTML;
+          })
         }
       })
 
-      return htmlElement.innerHTML
+      return htmlElement.innerHTML;
     }
   },
   {

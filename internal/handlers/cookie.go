@@ -9,7 +9,12 @@ import (
 // PostCookieValidation is the handler for cookie validation
 func (m *Repository) PostCookieValidation(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		_, res := checkForCookies(r, w)
+		id := checkForCookies(r, w)
+
+		var res bool = false
+		if id != 0 {
+			res = true
+		}
 
 		resp := models.JsonResponse{
 			OK: res,
