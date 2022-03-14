@@ -31,26 +31,28 @@ class Router {
       }
     }
 
-    // Push a history entry with the new url.
-    // We pass an empty object and an empty string as the historyState and title arguments, but their values do not really matter here.
     const url = `/${urlSegments.join('/')}`;
     history.pushState({}, '', url);
     
-    const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
+    const routerOutletElement = document.querySelector('[data-router-outlet]');
 
     if (this.authRes) {
-      if (!routerOutletElement.querySelectorAll('[auth-data-router-outlet]')[0] || matchedRoute.path == '/') {
-        const mainRouterElement = this._matchUrlToRoute([""]);
+      const mainRouterElement = this._matchUrlToRoute([""]);
+
+      if (!routerOutletElement.querySelector('[auth-data-router-outlet]')) {
         routerOutletElement.innerHTML = await mainRouterElement.getTemplate(mainRouterElement.params);
+      } else if (matchedRoute.path == '/') {
+        let fullMainPageHtml = document.createElement("div");
+        fullMainPageHtml.innerHTML = await mainRouterElement.getTemplate(mainRouterElement.params);     
+        routerOutletElement.querySelector('[auth-data-router-outlet]').innerHTML = fullMainPageHtml.querySelector('[auth-data-router-outlet]').innerHTML
       }
 
       if (matchedRoute.path != '/') {
-        let mainInnerHTMLRouter = routerOutletElement.querySelectorAll('[auth-data-router-outlet]')[0];
+        let mainInnerHTMLRouter = routerOutletElement.querySelector('[auth-data-router-outlet]');
         mainInnerHTMLRouter.innerHTML = await matchedRoute.getTemplate(matchedRoute.params);
       } 
     } else {
-      // Append the given template to the DOM inside the router outlet.
-      const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
+      const routerOutletElement = document.querySelector('[data-router-outlet]');
       routerOutletElement.innerHTML =  await matchedRoute.getTemplate(matchedRoute.params);
     }
 
@@ -63,27 +65,18 @@ class Router {
   }
 
   _matchUrlToRoute(urlSegments) {
-    // Try and match the URL to a route.
     const routeParams = {};
     const matchedRoute = this.routes.find(route => {
-
-      // We assume that the route path always starts with a slash, and so 
-      // the first item in the segments array  will always be an empty
-      // string. Slice the array at index 1 to ignore this empty string.
       const routePathSegments = route.path.split('/').slice(1);
 
-      // If there are different numbers of segments, then the route does not match the URL.
       if (routePathSegments.length !== urlSegments.length) {
         return false;
       }
 
-      // If each segment in the url matches the corresponding segment in the route path, 
-      // or the route path segment starts with a ':' then the route is matched.
       const match = routePathSegments.every((routePathSegment, i) => {
         return routePathSegment === urlSegments[i] || routePathSegment[0] === ':';
       });
 
-      // If the route matches the URL, pull out any params from the URL.
       if (match) {
         routePathSegments.forEach((segment, i) => {
           if (segment[0] === ':') {
@@ -99,10 +92,8 @@ class Router {
   }
 
   async _loadInitialRoute() {
-    // Figure out the path segments for the route which should load initially.
     const pathnameSplit = window.location.pathname.split('/');
     const pathSegments = pathnameSplit.length > 1 ? pathnameSplit.slice(1) : '';
-    // Load the initial route.
     await this.loadRoute(...pathSegments);
   }
 

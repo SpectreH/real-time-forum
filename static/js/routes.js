@@ -7,7 +7,6 @@ const routes = [
       <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
         <div class="container-fluid justify-content-start">
           <a class="navbar-brand" href="JavaScript:void(0);"  onclick="router.loadRoute('')">Real time forum</a>
-      
           <div class="d-flex ">
             <ul class="navbar-nav me-auto flex-row gap-2">
               <li class="nav-item">
