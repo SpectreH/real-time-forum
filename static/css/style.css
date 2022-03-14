@@ -109,6 +109,19 @@ header button {
   overflow-y: auto;
 }
 
+.user-online rect {
+  fill: #28d119;
+}
+
+
+.user-offline rect {
+  fill: #c9c3c3;
+}
+
+.user-offline a {
+  display: none;
+}
+
 @media (max-width: 991.98px) {
   .offcanvas-collapse {
     position: fixed;

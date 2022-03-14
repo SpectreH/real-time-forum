@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // User is the user model
 type User struct {
@@ -14,6 +16,14 @@ type User struct {
 	Password     string
 	SessionToken string
 	CreatedAt    time.Time
+}
+
+// Chatter is the model of user from chat list
+type Chatter struct {
+	ID       int    `json:"id"`
+	UserName string `json:"username"`
+	Online   bool   `json:"online"`
+	Myself   bool   `json:"myself"`
 }
 
 // Post is the post model

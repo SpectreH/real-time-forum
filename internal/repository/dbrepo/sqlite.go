@@ -323,3 +323,28 @@ func (m *sqliteDBRepo) GetUserName(id int) (string, error) {
 
 	return res, nil
 }
+
+// GetUserList gets all users id and username
+func (m *sqliteDBRepo) GetUserList() ([]models.Chatter, error) {
+	res := []models.Chatter{}
+
+	sqlStmt := `SELECT id, username FROM users ORDER BY username;`
+	rows, err := m.DB.Query(sqlStmt)
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		var chatter models.Chatter
+
+		err := rows.Scan(&chatter.ID, &chatter.UserName)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, chatter)
+	}
+
+	return res, nil
+}

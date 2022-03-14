@@ -33,27 +33,7 @@ const routes = [
           
           <div class="col-2 my-3 p-3 bg-body rounded shadow-sm">
             <h6 class="border-bottom pb-2 mb-0">User list</h6>
-            <div class="d-grid ov" id="user-list">
-              <div class="d-flex align-items-center" id="user-list-user">
-                <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="16" height="16" xmlns="http://www.w3.org/2000/svg"
-                  role="img" focusable="false">
-                  <rect width="100%" height="100%" id="user-list-status" fill="#28d119" />
-                </svg>
-                <span class="pe-2" id="user-list-name">Neeooo</span>
-                <a href="">
-                  <svg width="16" height="16">
-                    <use xlink:href="#email" />
-                  </svg>
-                </a>
-              </div>
-              <div class="d-flex align-items-center" id="user-list-user">
-                <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="16" height="16"
-                  xmlns="http://www.w3.org/2000/svg" role="img" focusable="false">
-                  <rect width="100%" height="100%" id="user-list-status" fill="#c9c3c3" />
-                </svg>
-                <span class="pe-2" id="user-list-name">Neeooo</span>
-              </div>
-            </div>
+            <div class="d-grid ov" id="user-list"></div>
           </div>
         </div>
       </main> 

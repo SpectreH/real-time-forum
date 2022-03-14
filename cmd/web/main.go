@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"real-time-forum/internal/handlers"
 	"real-time-forum/internal/routes"
+	"real-time-forum/internal/socket"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -15,7 +16,8 @@ func main() {
 	database, _ := sql.Open("sqlite3", "./database/forum.db")
 	defer database.Close()
 
-	handlersRepo := handlers.SetNewRepo(database)
+	socketReader := socket.SetSocketReader(database)
+	handlersRepo := handlers.SetNewRepo(database, socketReader)
 	handlers.SetNewHandlers(handlersRepo)
 
 	srv := &http.Server{

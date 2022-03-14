@@ -2,6 +2,7 @@ class Router {
   constructor(routes) {
     this.routes = routes;
     this.authRes;
+    this.chatSocket;
   }
 
   async initialize() {
@@ -51,6 +52,10 @@ class Router {
       // Append the given template to the DOM inside the router outlet.
       const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
       routerOutletElement.innerHTML =  await matchedRoute.getTemplate(matchedRoute.params);
+    }
+
+    if (this.chatSocket == undefined && this.authRes) {
+      this.chatSocket = await ChatSocket.create()
     }
 
     routerOutletElement.classList.remove("hide")

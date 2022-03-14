@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"real-time-forum/internal/repository"
 	"real-time-forum/internal/repository/dbrepo"
+	"real-time-forum/internal/socket"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -13,12 +14,14 @@ import (
 // Repository is the repository type (Repository pattern)
 type Repository struct {
 	DB repository.DatabaseRepo
+	SR *socket.SocketReader
 }
 
 // SetNewRepo creates a new repository
-func SetNewRepo(conn *sql.DB) *Repository {
+func SetNewRepo(conn *sql.DB, sr *socket.SocketReader) *Repository {
 	return &Repository{
 		DB: dbrepo.SetSqliteRepo(conn),
+		SR: sr,
 	}
 }
 
