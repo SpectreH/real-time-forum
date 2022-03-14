@@ -70,6 +70,18 @@ func (sr *SocketReader) setUserList() ([]models.Chatter, error) {
 	return chatters, err
 }
 
+func (sr *SocketReader) removeMultipleConnection() {
+	for _, socket := range savedSocketReader {
+		if socket == sr {
+			continue
+		}
+
+		if socket.id == sr.id {
+			socket.closeConnection()
+		}
+	}
+}
+
 // startThread connects user to chat
 func (sr *SocketReader) startThread() {
 	go func() {
@@ -81,6 +93,8 @@ func (sr *SocketReader) startThread() {
 			log.Println("thread socketreader finish")
 			sr.closeConnection()
 		}()
+
+		sr.removeMultipleConnection()
 
 		chatters, err := sr.setUserList()
 		if err != nil {
@@ -94,17 +108,37 @@ func (sr *SocketReader) startThread() {
 			sr.closeConnection()
 		}
 
+		sr.broadcastConnection(sr.id, true)
+
 		for {
 			sr.read()
 		}
 	}()
 }
 
+// broadcastConnection sends notify to users about new user connection
+func (sr *SocketReader) broadcastConnection(id int, status bool) {
+	for _, g := range savedSocketReader {
+		if g == sr {
+			continue
+		}
+
+		chatter := models.Chatter{
+			ID:     id,
+			Online: status,
+		}
+
+		if err := g.conn.WriteJSON(chatter); err != nil {
+			log.Println(err)
+			sr.closeConnection()
+		}
+	}
+}
+
 // broadcast sends messages to users
 func (sr *SocketReader) broadcast(str string) {
 	for _, g := range savedSocketReader {
 		if g == sr {
-			// no send message to himself
 			continue
 		}
 
@@ -134,8 +168,9 @@ func (sr *SocketReader) writeMsg(name string, str string) {
 func (sr *SocketReader) closeConnection() {
 	for i, socket := range savedSocketReader {
 		if socket == sr {
-			sr.conn.Close()
 			savedSocketReader = append(savedSocketReader[:i], savedSocketReader[i+1:]...)
+			sr.broadcastConnection(sr.id, false)
+			sr.conn.Close()
 			return
 		}
 	}

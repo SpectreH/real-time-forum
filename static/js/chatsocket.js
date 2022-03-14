@@ -18,8 +18,10 @@ class ChatSocket {
     users.filter(u => !u.myself).forEach(user => {
       let element = document.createElement("div");
       
+      console.log(user);
+
       element.innerHTML = `
-        <div class="d-flex align-items-center" id="user-list-user">
+        <div class="d-flex align-items-center" id="user-${user.id}">
           <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded-circle" width="16" height="16" xmlns="http://www.w3.org/2000/svg"
             role="img" focusable="false">
             <rect width="100%" height="100%" />
@@ -33,14 +35,26 @@ class ChatSocket {
         </div>
       `;
 
-      if (user.online) {
-        element.querySelector("#user-list-user").classList.add("user-online");
-      } else {
-        element.querySelector("#user-list-user").classList.add("user-offline");
-      }
+      this.changeUserStatus(element, user.id, user.online);
 
       this.userList.append(element);
     });
+  }
+
+  changeUserStatus(element, id, status) {
+    let userElement = element.querySelector(`#user-${id}`)
+
+    if (userElement == undefined) {
+      return
+    }
+
+    if (status) {
+      userElement.classList.add("user-online");
+      userElement.classList.remove("user-offline");
+    } else {
+      userElement.classList.add("user-offline");
+      userElement.classList.remove("user-online");
+    }
   }
 
   showMessage(text, myself) {
@@ -59,7 +73,6 @@ class ChatSocket {
   }
 
   async connectSocket() {
-    console.log("memulai socket");
     var socket = new WebSocket("ws://localhost:9000/socket");
     this.chatSocket = socket;
 
@@ -72,6 +85,11 @@ class ChatSocket {
 
       if (Array.isArray(data)) {
         this.loadUserList(data)
+        return
+      }
+
+      if (typeof data === 'object') {
+        this.changeUserStatus(this.userList, data.id, data.online);
         return
       }
 
