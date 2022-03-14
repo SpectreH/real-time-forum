@@ -27,7 +27,7 @@ class ChatSocket {
             <rect width="100%" height="100%" />
           </svg>
           <span class="pe-2">${user.username}</span>
-          <a href="">
+          <a href="JavaScript:void(0);" onclick="router.loadRoute('chat', '${user.id}')">
             <svg width="16" height="16">
               <use xlink:href="#email" />
             </svg>

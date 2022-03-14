@@ -244,6 +244,46 @@ const routes = [
     }
   },
   {
+    path: '/chat/:userid',
+    getTemplate: async (params) => { 
+      let htmlElement = document.createElement("div")
+      htmlElement.innerHTML = `
+        <div class="border-bottom pb-2 mb-0 d-flex">
+          <h6 class="">Chat</h6>
+        </div>
+        <div id="category-list">
+          <div class="chat-log">
+            <div class="text-center">
+              <h2>No messages here yeat...</h2>
+            </div>
+            <div class="chat-log-item">
+              <div class="chat-log-message-header">
+                <h3>Qwerty</h3>
+              </div>
+              <div class="chat-log-message">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its
+              layout. The point of using Lorem Ipsum</div>
+              <p class="chat-log-date mb-0 mt-3 font-weight-light">23.02.1222 12:30</p>
+            </div>
+            <div class="chat-log-item chat-log-item-own">
+              <div class="chat-log-message-header">
+                <h3>Max Paine</h3>
+              </div>
+              <div class="chat-log-message">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its
+              layout. The point of using Lorem Ipsum</div>
+              <p class="chat-log-date mb-0 mt-3 font-weight-light">23.02.1222 12:30</p>
+            </div>
+          </div>
+          <div class="input-group">
+            <textarea class="chat-textarea form-control" placeholder="Type your message here"
+              aria-label="Chat textarea"></textarea>
+          </div>
+        </div>
+      `
+
+      return htmlElement.innerHTML;
+    }
+  },
+  {
     path: '/login',
     getTemplate: (params) => `
       <section id="login-section" class="m-auto d-flex align-items-center text-center login-section">
