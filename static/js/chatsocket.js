@@ -2,6 +2,7 @@ class ChatSocket {
   constructor() {
     this.chatSocket = null;
     this.userList = document.getElementById("user-list");
+    this.myself = null;
   }
 
   async initialize() {
@@ -15,10 +16,8 @@ class ChatSocket {
   }
 
   loadUserList(users) {
-    users.filter(u => !u.myself).forEach(user => {
+    users.forEach(user => {
       let element = document.createElement("div");
-      
-      console.log(user);
 
       element.innerHTML = `
         <div class="d-flex align-items-center" id="user-${user.id}">
@@ -37,7 +36,11 @@ class ChatSocket {
 
       this.changeUserStatus(element, user.id, user.online);
 
-      this.userList.append(element);
+      if (!user.myself) {
+        this.userList.append(element);
+      } else {
+        this.myself = user;
+      }
     });
   }
 
@@ -61,14 +64,21 @@ class ChatSocket {
     console.log(text)
   }
 
-  send() {
-    console.log("send")
-    //this.mysocket.send(txt);
+  send(txt, toUser) {
+    if (Number.isNaN(toUser)) { return }
+    this.chatSocket.send(JSON.stringify({
+      type: "message",
+      message: txt,
+      fromUserId: this.myself.id,
+      toUserId: toUser
+    }))
   }
 
-  keypress(e) {
+  keypress(e, toUser) {
     if (e.keyCode == 13) {
-      this.send();
+      e.preventDefault()
+      this.send(e.target.value, toUser);
+      e.target.value = "";
     }
   }
 
@@ -88,12 +98,11 @@ class ChatSocket {
         return
       }
 
-      if (typeof data === 'object') {
+      if (data.type == "connection") {
         this.changeUserStatus(this.userList, data.id, data.online);
-        return
+      } else if (data.type == "message") {
+        this.showMessage(data);
       }
-
-      this.showMessage(e.data, false);
     }
     socket.onopen = () => {
       console.log("socket opend")

@@ -6,7 +6,7 @@ const routes = [
       htmlElement.innerHTML = `
       <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="Main navigation">
         <div class="container-fluid justify-content-start">
-          <a class="navbar-brand" href="JavaScript:void(0);"  onclick="router.loadRoute('')">Real time forum</a>
+          <a class="navbar-brand" href="JavaScript:void(0);" onclick="router.loadRoute('')">Real time forum</a>
           <div class="d-flex ">
             <ul class="navbar-nav me-auto flex-row gap-2">
               <li class="nav-item">
@@ -252,33 +252,60 @@ const routes = [
           <h6 class="">Chat</h6>
         </div>
         <div id="category-list">
-          <div class="chat-log">
-            <div class="text-center">
-              <h2>No messages here yeat...</h2>
-            </div>
-            <div class="chat-log-item">
-              <div class="chat-log-message-header">
-                <h3>Qwerty</h3>
-              </div>
-              <div class="chat-log-message">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its
-              layout. The point of using Lorem Ipsum</div>
-              <p class="chat-log-date mb-0 mt-3 font-weight-light">23.02.1222 12:30</p>
-            </div>
-            <div class="chat-log-item chat-log-item-own">
-              <div class="chat-log-message-header">
-                <h3>Max Paine</h3>
-              </div>
-              <div class="chat-log-message">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its
-              layout. The point of using Lorem Ipsum</div>
-              <p class="chat-log-date mb-0 mt-3 font-weight-light">23.02.1222 12:30</p>
-            </div>
+          <div class="chat-log" id="chat-log">
           </div>
           <div class="input-group">
-            <textarea class="chat-textarea form-control" placeholder="Type your message here"
-              aria-label="Chat textarea"></textarea>
+            <textarea class="chat-textarea form-control" placeholder="Type your message here" aria-label="Chat textarea"></textarea>
           </div>
         </div>
       `
+
+      let newFormData = new FormData
+      newFormData.append("secondUserId", parseInt(params.userid))
+      newFormData.append("page", 0)
+
+      await fetch('/get-chat', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
+        if (res.ok == false) {
+          GenerateAlert("Error with getting chat messages", "error");
+        } else {
+          let chatlogElement = htmlElement.querySelector("#chat-log")
+
+          if (res.length == 0) {
+            chatlogElement.innerHTML += `
+              <div class="text-center">
+                <h2>No messages here yeat...</h2>
+              </div>
+            `
+          }
+
+          res.forEach(message => {
+            let myMessage = document.createElement("div");
+            let hisMessage = document.createElement("div");
+            hisMessage.classList.add("chat-log-item", "chat-log-item-own")
+            myMessage.classList.add("chat-log-item")
+
+            if (message.fromUserId == parseInt(params.userid)) {
+              hisMessage.innerHTML = `
+                <div class="chat-log-message-header">
+                  <h3>Max Paine</h3>
+                </div>
+                <div class="chat-log-message">${message.message}</div>
+                <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+              `
+              chatlogElement.insertBefore(hisMessage, chatlogElement.firstChild);
+            } else {
+              myMessage.innerHTML = `
+                <div class="chat-log-message-header">
+                  <h3>Qwerty</h3>
+                </div>
+                <div class="chat-log-message">${message.message}</div>
+                <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+              `
+              chatlogElement.insertBefore(myMessage, chatlogElement.firstChild);
+            }
+          })
+        }
+      })
 
       return htmlElement.innerHTML;
     }

@@ -2,10 +2,12 @@ package socket
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"real-time-forum/internal/models"
 	"real-time-forum/internal/repository"
 	"real-time-forum/internal/repository/dbrepo"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -124,6 +126,7 @@ func (sr *SocketReader) broadcastConnection(id int, status bool) {
 		}
 
 		chatter := models.Chatter{
+			Type:   "connection",
 			ID:     id,
 			Online: status,
 		}
@@ -135,33 +138,53 @@ func (sr *SocketReader) broadcastConnection(id int, status bool) {
 	}
 }
 
-// broadcast sends messages to users
-func (sr *SocketReader) broadcast(str string) {
+// broadcast sends message to user
+func (sr *SocketReader) broadcast(message models.Message) {
 	for _, g := range savedSocketReader {
 		if g == sr {
 			continue
 		}
 
-		g.writeMsg(sr.name, str)
+		if message.ToUserID == g.id {
+			g.writeMsg(message)
+			break
+		}
 	}
 }
 
 // read reads messages from user
 func (sr *SocketReader) read() {
-	_, b, er := sr.conn.ReadMessage()
-	if er != nil {
-		panic(er)
+	_, b, err := sr.conn.ReadMessage()
+	if err != nil {
+		log.Println(err)
+		sr.closeConnection()
+		return
 	}
-	log.Println(sr.name + " " + string(b))
 
-	sr.broadcast(string(b))
+	message := models.Message{
+		Created: time.Now(),
+	}
 
-	log.Println(sr.name + " " + string(b))
+	err = json.Unmarshal(b, &message)
+	if err != nil {
+		log.Println(err)
+		sr.closeConnection()
+		return
+	}
+
+	err = sr.db.InsertMessage(message)
+	if err != nil {
+		log.Println(err)
+		sr.closeConnection()
+		return
+	}
+
+	sr.broadcast(message)
 }
 
-// writeMsg writes messages to users
-func (sr *SocketReader) writeMsg(name string, str string) {
-	sr.conn.WriteMessage(websocket.TextMessage, []byte("<b>"+name+": </b>"+str))
+// writeMsg writes message to user
+func (sr *SocketReader) writeMsg(message models.Message) {
+	sr.conn.WriteJSON(message)
 }
 
 // closeConnection disconnects user and removes from the array

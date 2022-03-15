@@ -68,6 +68,18 @@ func (m *sqliteDBRepo) InsertPostCategory(categories []string, postId int) error
 	return nil
 }
 
+// InsertMessage inserts a new message from private chat into database
+func (m *sqliteDBRepo) InsertMessage(message models.Message) error {
+	query := `insert into messages (from_user_id, to_user_id, message, created) values ($1, $2, $3, $4);`
+	_, err := m.DB.Exec(query, &message.FromUserID, &message.ToUserID, &message.Message, time.Now())
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CheckUsernameExistence checks if username is already taken
 func (m *sqliteDBRepo) CheckUsernameExistence(username string) (int, error) {
 	var id int
@@ -344,6 +356,38 @@ func (m *sqliteDBRepo) GetUserList() ([]models.Chatter, error) {
 		}
 
 		res = append(res, chatter)
+	}
+
+	return res, nil
+}
+
+// GetMessages gets all maximum 10 messages per pag from private chat
+func (m *sqliteDBRepo) GetMessages(firstUserId int, secondUserId int, page int) ([]models.Message, error) {
+	res := []models.Message{}
+
+	sqlStmt := `
+	SELECT * FROM messages 
+	WHERE (to_user_id = $1 and from_user_id = $2) OR (to_user_id = $2 and from_user_id = $1) 
+	ORDER BY created DESC
+	LIMIT 10
+	OFFSET (10 * $3);
+	`
+
+	rows, err := m.DB.Query(sqlStmt, firstUserId, secondUserId, page)
+
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		var message models.Message
+
+		err := rows.Scan(&message.ID, &message.FromUserID, &message.ToUserID, &message.Message, &message.Created)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, message)
 	}
 
 	return res, nil

@@ -20,6 +20,7 @@ type User struct {
 
 // Chatter is the model of user from chat list
 type Chatter struct {
+	Type     string `json:"type"`
 	ID       int    `json:"id"`
 	UserName string `json:"username"`
 	Online   bool   `json:"online"`
@@ -62,6 +63,15 @@ type PostCategory struct {
 	ID         int
 	PostID     int
 	CategoryID int
+}
+
+type Message struct {
+	Type       string    `json:"type"`
+	ID         int       `json:"id"`
+	FromUserID int       `json:"fromUserId"`
+	ToUserID   int       `json:"toUserId"`
+	Message    string    `json:"message"`
+	Created    time.Time `json:"created"`
 }
 
 type JsonResponse struct {

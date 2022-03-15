@@ -153,11 +153,12 @@ header button {
 /* Chat */
 
 .chat-log {
-	height: auto;
-  max-height: 500px;
-	overflow: auto;
+  height: 500px;
+  overflow-y: scroll;
+  overflow-x: hidden;
   margin: 20px 0 20px 0;
 }
+
 .chat-log-item {
 	background: #fafafa;
 	padding: 10px;

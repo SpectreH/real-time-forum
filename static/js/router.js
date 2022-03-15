@@ -60,6 +60,14 @@ class Router {
       this.chatSocket = await ChatSocket.create()
     }
 
+    if (matchedRoute.path == '/chat/:userid' && this.chatSocket != undefined && this.authRes) {
+      let func = this.chatSocket.keypress
+      let funcBind = func.bind(this.chatSocket);
+      routerOutletElement.querySelector(".chat-textarea").addEventListener("keypress", function (event) {
+        funcBind(event, parseInt(urlSegments[1]))
+      }.bind(funcBind))
+    }
+
     routerOutletElement.classList.remove("hide")
     this.formValidation();
   }

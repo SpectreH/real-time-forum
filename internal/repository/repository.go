@@ -8,6 +8,7 @@ type DatabaseRepo interface {
 	InsertPost(post models.Post) (int, error)
 	InsertComment(comment models.PostComment) error
 	InsertPostCategory(categories []string, postId int) error
+	InsertMessage(message models.Message) error
 	CheckUsernameExistence(username string) (int, error)
 	CheckEmailExistence(email string) (int, error)
 	CheckSessionExistence(token string) (int, error)
@@ -21,4 +22,5 @@ type DatabaseRepo interface {
 	GetUserHash(id int) (string, error)
 	GetUserName(id int) (string, error)
 	GetUserList() ([]models.Chatter, error)
+	GetMessages(firstUserId int, secondUserId int, page int) ([]models.Message, error)
 }

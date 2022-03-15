@@ -20,7 +20,7 @@ func SetRoutes() http.Handler {
 	mux.HandleFunc("/new-comment", handlers.Repo.NewComment)
 	mux.HandleFunc("/get-post-list", handlers.Repo.GetPostList)
 	mux.HandleFunc("/get-post", handlers.Repo.GetPost)
-	mux.HandleFunc("/get-user-list", handlers.Repo.GetPost)
+	mux.HandleFunc("/get-chat", handlers.Repo.GetChat)
 
 	mux.HandleFunc("/socket", handlers.Repo.CreateSocketReader)
 	mux.HandleFunc("/cookie-validation", handlers.Repo.PostCookieValidation)
