@@ -141,13 +141,8 @@ func (sr *SocketReader) broadcastConnection(id int, status bool) {
 // broadcast sends message to user
 func (sr *SocketReader) broadcast(message models.Message) {
 	for _, g := range savedSocketReader {
-		if g == sr {
-			continue
-		}
-
-		if message.ToUserID == g.id {
+		if message.ToUserID == g.id || g == sr {
 			g.writeMsg(message)
-			break
 		}
 	}
 }
@@ -171,6 +166,20 @@ func (sr *SocketReader) read() {
 	}
 
 	err = sr.db.InsertMessage(message)
+	if err != nil && err != sql.ErrNoRows {
+		log.Println(err)
+		sr.closeConnection()
+		return
+	}
+
+	message.FromUsername, err = sr.db.GetUserName(message.FromUserID)
+	if err != nil {
+		log.Println(err)
+		sr.closeConnection()
+		return
+	}
+
+	message.ToUsername, err = sr.db.GetUserName(message.ToUserID)
 	if err != nil {
 		log.Println(err)
 		sr.closeConnection()

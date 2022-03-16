@@ -259,16 +259,25 @@ const routes = [
           </div>
         </div>
       `
-
+      let chatlogElement = htmlElement.querySelector("#chat-log")
       let newFormData = new FormData
       newFormData.append("secondUserId", parseInt(params.userid))
+      newFormData.append("offset", 10);
       newFormData.append("page", 0)
 
+      if (Number.isNaN(parseInt(params.userid))) {
+        chatlogElement.innerHTML += `
+          <div class="text-center" id="no-messages">
+            <h2>No messages here yeat...</h2>
+          </div>
+        `
+        return htmlElement.innerHTML;
+      }
+
       await fetch('/get-chat', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
-        let chatlogElement = htmlElement.querySelector("#chat-log")
         if (res.length == 0 || res.ok == false) {
           chatlogElement.innerHTML += `
-              <div class="text-center">
+              <div class="text-center" id="no-messages">
                 <h2>No messages here yeat...</h2>
               </div>
             `
@@ -281,7 +290,7 @@ const routes = [
             let messageHTML = document.createElement("div");
             messageHTML.innerHTML = `
               <div class="chat-log-message-header">
-                <h3>Qwerty</h3>
+                <h3>${message.fromUsername}</h3>
               </div>
               <div class="chat-log-message">${message.message}</div>
               <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>

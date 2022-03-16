@@ -22,5 +22,5 @@ type DatabaseRepo interface {
 	GetUserHash(id int) (string, error)
 	GetUserName(id int) (string, error)
 	GetUserList() ([]models.Chatter, error)
-	GetMessages(firstUserId int, secondUserId int, page int) ([]models.Message, error)
+	GetMessages(firstUserId int, secondUserId int, page int, offset int) ([]models.Message, error)
 }

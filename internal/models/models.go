@@ -66,12 +66,14 @@ type PostCategory struct {
 }
 
 type Message struct {
-	Type       string    `json:"type"`
-	ID         int       `json:"id"`
-	FromUserID int       `json:"fromUserId"`
-	ToUserID   int       `json:"toUserId"`
-	Message    string    `json:"message"`
-	Created    time.Time `json:"created"`
+	Type         string    `json:"type"`
+	ID           int       `json:"id"`
+	FromUserID   int       `json:"fromUserId"`
+	ToUserID     int       `json:"toUserId"`
+	FromUsername string    `json:"fromUsername"`
+	ToUsername   string    `json:"toUsername"`
+	Message      string    `json:"message"`
+	Created      time.Time `json:"created"`
 }
 
 type JsonResponse struct {

@@ -61,71 +61,63 @@ class Router {
     }
 
     if (matchedRoute.path == '/chat/:userid' && this.chatSocket != undefined && this.authRes) {
-      let chat = document.querySelector("#chat-log");
-      this.chatSocket.chat = chat;
+      this.chatSocket.currentChatPage = 0;
+      this.chatSocket.offsetToApply = 10;
+      this.chatSocket.chat = document.querySelector("#chat-log");
+
       let func = this.chatSocket.keypress;
       let funcBind = func.bind(this.chatSocket);
       routerOutletElement.querySelector(".chat-textarea").addEventListener("keypress", function (event) {
         funcBind(event, parseInt(urlSegments[1]))
       }.bind(funcBind));
 
-      let pageBind = this.chatSocket.currentChatPage
-      let currentPageIsLastBind = this.chatSocket.currentPageIsLast
-      
       let loadNewMessages = _.throttle(async function () {
-        if (chat.scrollTop < 200 && !currentPageIsLastBind) {
-          let prevScrollHeight = chat.scrollHeight;
-          let prevScrollTop = chat.scrollTop;
+        if (this.chatSocket.chat.scrollTop < 200 && !this.chatSocket.currentPageIsLast) {
+          let prevScrollHeight = this.chatSocket.chat.scrollHeight;
+          let prevScrollTop = this.chatSocket.chat.scrollTop;
 
-          pageBind++;
-          let newFormData = new FormData
-          newFormData.append("secondUserId", parseInt(urlSegments[1]))
-          newFormData.append("page", pageBind)
+          this.chatSocket.currentChatPage++;
+          let newFormData = new FormData;
+          newFormData.append("secondUserId", parseInt(urlSegments[1]));
+          newFormData.append("offset", this.chatSocket.offsetToApply);
+          newFormData.append("page", this.chatSocket.currentChatPage);
 
           await fetch('/get-chat', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
             if (res.ok == false) {
               GenerateAlert("Error with getting chat messages", "error");
             } else {
               res.forEach(message => {
-                let myMessage = document.createElement("div");
-                let hisMessage = document.createElement("div");
-                hisMessage.classList.add("chat-log-item", "chat-log-item-own")
-                myMessage.classList.add("chat-log-item")
-
+                let messageHTML = document.createElement("div");
+                messageHTML.innerHTML = `
+                  <div class="chat-log-message-header">
+                    <h3>${message.fromUsername}</h3>
+                  </div>
+                  <div class="chat-log-message">${message.message}</div>
+                  <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+                `
+                
                 if (message.fromUserId == parseInt(urlSegments[1])) {
-                  hisMessage.innerHTML = `
-                    <div class="chat-log-message-header">
-                      <h3>Max Paine</h3>
-                    </div>
-                    <div class="chat-log-message">${message.message}</div>
-                    <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
-                  `
-                  chat.insertBefore(hisMessage, chat.firstChild);
+                  messageHTML.classList.add("chat-log-item", "chat-log-item-own")
                 } else {
-                  myMessage.innerHTML = `
-                    <div class="chat-log-message-header">
-                      <h3>Qwerty</h3>
-                    </div>
-                    <div class="chat-log-message">${message.message}</div>
-                    <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
-                  `
-                  chat.insertBefore(myMessage, chat.firstChild);
+                  messageHTML.classList.add("chat-log-item")
                 }
+
+                this.chatSocket.chat.insertBefore(messageHTML, this.chatSocket.chat.firstChild);
               })
             }
 
             if (res.length < 10 || res.length == undefined) {
-              chat.removeEventListener("scroll", loadNewMessages);
-              currentPageIsLastBind = true;
+              this.chatSocket.chat.removeEventListener("scroll", loadNewMessages);
+              this.chatSocket.currentPageIsLast = true;
             }
           });
 
-          chat.scrollTop = chat.scrollHeight - prevScrollHeight + prevScrollTop;
+          this.chatSocket.chat.scrollTop = this.chatSocket.chat.scrollHeight - prevScrollHeight + prevScrollTop;
         }
-      }, 300);
+      }, 300).bind(this);
 
-      chat.addEventListener("scroll", loadNewMessages);
-      chat.scrollTop = chat.scrollHeight;
+      this.chatSocket.chat.addEventListener("scroll", loadNewMessages);
+      this.chatSocket.chat.scrollTop = this.chatSocket.chat.scrollHeight;
     }
 
     routerOutletElement.classList.remove("hide")

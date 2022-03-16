@@ -6,6 +6,7 @@ class ChatSocket {
     this.chat = null;
     this.currentChatPage = 0;
     this.currentPageIsLast = false;
+    this.offsetToApply = 10;
   }
 
   async initialize() {
@@ -64,6 +65,7 @@ class ChatSocket {
   }
 
   showMessage(text) {
+    let userName;
     let timeInLocalTimeZone = new Date(new Date().setHours(new Date().getHours() + 2));
     let messageHTML = document.createElement("div");
     let changeScroll = false;
@@ -71,29 +73,38 @@ class ChatSocket {
       changeScroll = true;
     }
 
-    messageHTML.innerHTML = `
-      <div class="chat-log-message-header">
-        <h3>Qwerty</h3>
-      </div>
-      <div class="chat-log-message">${text.message}</div>
-      <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(timeInLocalTimeZone.toISOString())}</p>
-    `;      
-
+    if (this.chat.querySelector("#no-messages")) {
+      this.chat.querySelector("#no-messages").remove();
+    }
+    
     if (text.fromUserId == this.myself.id) {
       messageHTML.classList.add("chat-log-item");
     } else {
       messageHTML.classList.add("chat-log-item", "chat-log-item-own");
     }
 
+    messageHTML.innerHTML = `
+      <div class="chat-log-message-header">
+        <h3>${text.fromUsername}</h3>
+      </div>
+      <div class="chat-log-message">${text.message}</div>
+      <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(timeInLocalTimeZone.toISOString())}</p>
+    `; 
+
     this.chat.appendChild(messageHTML);
 
     if (changeScroll) {
       this.chat.scrollTop = this.chat.scrollHeight 
     }
+
+    this.offsetToApply++;
+    if (this.offsetToApply == 20) {
+      this.currentChatPage++;
+      this.offsetToApply = 10;
+    }
   }
 
   send(text) {
-    if (Number.isNaN(text.toUser)) { return }
     this.chatSocket.send(JSON.stringify(text))
   }
 
@@ -101,7 +112,7 @@ class ChatSocket {
     if (e.keyCode == 13) {
       e.preventDefault()
 
-      if (e.target.value.replace(/\s/g, '').length != 0) {
+      if (e.target.value.replace(/\s/g, '').length != 0 && !Number.isNaN(toUser)) {
         let text = {
           type: "message",
           message: e.target.value,
@@ -110,7 +121,6 @@ class ChatSocket {
         }
 
         this.send(text);
-        this.showMessage(text);
       }
 
       e.target.value = "";

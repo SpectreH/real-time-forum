@@ -70,8 +70,13 @@ func (m *sqliteDBRepo) InsertPostCategory(categories []string, postId int) error
 
 // InsertMessage inserts a new message from private chat into database
 func (m *sqliteDBRepo) InsertMessage(message models.Message) error {
+	_, err := m.GetUserName(message.ToUserID)
+	if err != nil {
+		return err
+	}
+
 	query := `insert into messages (from_user_id, to_user_id, message, created) values ($1, $2, $3, $4);`
-	_, err := m.DB.Exec(query, &message.FromUserID, &message.ToUserID, &message.Message, time.Now())
+	_, err = m.DB.Exec(query, &message.FromUserID, &message.ToUserID, &message.Message, time.Now())
 
 	if err != nil {
 		return err
@@ -362,18 +367,20 @@ func (m *sqliteDBRepo) GetUserList() ([]models.Chatter, error) {
 }
 
 // GetMessages gets all maximum 10 messages per pag from private chat
-func (m *sqliteDBRepo) GetMessages(firstUserId int, secondUserId int, page int) ([]models.Message, error) {
+func (m *sqliteDBRepo) GetMessages(firstUserId int, secondUserId int, page int, offset int) ([]models.Message, error) {
 	res := []models.Message{}
+
+	offsetCalc := (offset - 10) * (page - 1)
 
 	sqlStmt := `
 	SELECT * FROM messages 
 	WHERE (to_user_id = $1 and from_user_id = $2) OR (to_user_id = $2 and from_user_id = $1) 
 	ORDER BY created DESC
 	LIMIT 10
-	OFFSET (10 * $3);
+	OFFSET (($4 * $3) - $5);
 	`
 
-	rows, err := m.DB.Query(sqlStmt, firstUserId, secondUserId, page)
+	rows, err := m.DB.Query(sqlStmt, firstUserId, secondUserId, page, offset, offsetCalc)
 
 	if err != nil {
 		return res, err
@@ -383,6 +390,16 @@ func (m *sqliteDBRepo) GetMessages(firstUserId int, secondUserId int, page int) 
 		var message models.Message
 
 		err := rows.Scan(&message.ID, &message.FromUserID, &message.ToUserID, &message.Message, &message.Created)
+		if err != nil {
+			return nil, err
+		}
+
+		message.FromUsername, err = m.GetUserName(message.FromUserID)
+		if err != nil {
+			return nil, err
+		}
+
+		message.ToUsername, err = m.GetUserName(message.ToUserID)
 		if err != nil {
 			return nil, err
 		}
