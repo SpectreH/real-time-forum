@@ -3,6 +3,9 @@ class ChatSocket {
     this.chatSocket = null;
     this.userList = document.getElementById("user-list");
     this.myself = null;
+    this.chat = null;
+    this.currentChatPage = 0;
+    this.currentPageIsLast = false;
   }
 
   async initialize() {
@@ -60,24 +63,56 @@ class ChatSocket {
     }
   }
 
-  showMessage(text, myself) {
-    console.log(text)
+  showMessage(text) {
+    let timeInLocalTimeZone = new Date(new Date().setHours(new Date().getHours() + 2));
+    let messageHTML = document.createElement("div");
+    let changeScroll = false;
+    if (this.chat.scrollTop == this.chat.scrollHeight - this.chat.offsetHeight) {
+      changeScroll = true;
+    }
+
+    messageHTML.innerHTML = `
+      <div class="chat-log-message-header">
+        <h3>Qwerty</h3>
+      </div>
+      <div class="chat-log-message">${text.message}</div>
+      <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(timeInLocalTimeZone.toISOString())}</p>
+    `;      
+
+    if (text.fromUserId == this.myself.id) {
+      messageHTML.classList.add("chat-log-item");
+    } else {
+      messageHTML.classList.add("chat-log-item", "chat-log-item-own");
+    }
+
+    this.chat.appendChild(messageHTML);
+
+    if (changeScroll) {
+      this.chat.scrollTop = this.chat.scrollHeight 
+    }
   }
 
-  send(txt, toUser) {
-    if (Number.isNaN(toUser)) { return }
-    this.chatSocket.send(JSON.stringify({
-      type: "message",
-      message: txt,
-      fromUserId: this.myself.id,
-      toUserId: toUser
-    }))
+  send(text) {
+    if (Number.isNaN(text.toUser)) { return }
+    this.chatSocket.send(JSON.stringify(text))
   }
 
   keypress(e, toUser) {
     if (e.keyCode == 13) {
       e.preventDefault()
-      this.send(e.target.value, toUser);
+
+      if (e.target.value.replace(/\s/g, '').length != 0) {
+        let text = {
+          type: "message",
+          message: e.target.value,
+          fromUserId: this.myself.id,
+          toUserId: toUser
+        }
+
+        this.send(text);
+        this.showMessage(text);
+      }
+
       e.target.value = "";
     }
   }

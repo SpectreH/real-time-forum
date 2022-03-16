@@ -265,48 +265,40 @@ const routes = [
       newFormData.append("page", 0)
 
       await fetch('/get-chat', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
-        if (res.ok == false) {
-          GenerateAlert("Error with getting chat messages", "error");
-        } else {
-          let chatlogElement = htmlElement.querySelector("#chat-log")
-
-          if (res.length == 0) {
-            chatlogElement.innerHTML += `
+        let chatlogElement = htmlElement.querySelector("#chat-log")
+        if (res.length == 0 || res.ok == false) {
+          chatlogElement.innerHTML += `
               <div class="text-center">
                 <h2>No messages here yeat...</h2>
               </div>
             `
-          }
+        }
 
+        if (res.ok == false) {
+          GenerateAlert("Error with getting chat messages", "error");
+        } else {
           res.forEach(message => {
-            let myMessage = document.createElement("div");
-            let hisMessage = document.createElement("div");
-            hisMessage.classList.add("chat-log-item", "chat-log-item-own")
-            myMessage.classList.add("chat-log-item")
+            let messageHTML = document.createElement("div");
+            messageHTML.innerHTML = `
+              <div class="chat-log-message-header">
+                <h3>Qwerty</h3>
+              </div>
+              <div class="chat-log-message">${message.message}</div>
+              <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+            `
 
             if (message.fromUserId == parseInt(params.userid)) {
-              hisMessage.innerHTML = `
-                <div class="chat-log-message-header">
-                  <h3>Max Paine</h3>
-                </div>
-                <div class="chat-log-message">${message.message}</div>
-                <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
-              `
-              chatlogElement.insertBefore(hisMessage, chatlogElement.firstChild);
+              messageHTML.classList.add("chat-log-item", "chat-log-item-own")
             } else {
-              myMessage.innerHTML = `
-                <div class="chat-log-message-header">
-                  <h3>Qwerty</h3>
-                </div>
-                <div class="chat-log-message">${message.message}</div>
-                <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
-              `
-              chatlogElement.insertBefore(myMessage, chatlogElement.firstChild);
+              messageHTML.classList.add("chat-log-item")
             }
+
+            chatlogElement.insertBefore(messageHTML, chatlogElement.firstChild);
           })
         }
       })
 
+      
       return htmlElement.innerHTML;
     }
   },

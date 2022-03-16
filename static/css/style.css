@@ -4,7 +4,7 @@ body {
 }
 
 .hide {
-  display: none;
+  visibility: hidden;
 }
 
 section {
@@ -154,7 +154,7 @@ header button {
 
 .chat-log {
   height: 500px;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   margin: 20px 0 20px 0;
 }

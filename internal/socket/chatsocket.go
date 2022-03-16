@@ -156,9 +156,7 @@ func (sr *SocketReader) broadcast(message models.Message) {
 func (sr *SocketReader) read() {
 	_, b, err := sr.conn.ReadMessage()
 	if err != nil {
-		log.Println(err)
-		sr.closeConnection()
-		return
+		panic(err)
 	}
 
 	message := models.Message{

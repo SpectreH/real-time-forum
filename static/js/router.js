@@ -6,7 +6,7 @@ class Router {
   }
 
   async initialize() {
-    await this.cookieValidation()
+    await this.cookieValidation();
     await this._loadInitialRoute();
   }
 
@@ -44,7 +44,7 @@ class Router {
       } else if (matchedRoute.path == '/') {
         let fullMainPageHtml = document.createElement("div");
         fullMainPageHtml.innerHTML = await mainRouterElement.getTemplate(mainRouterElement.params);     
-        routerOutletElement.querySelector('[auth-data-router-outlet]').innerHTML = fullMainPageHtml.querySelector('[auth-data-router-outlet]').innerHTML
+        routerOutletElement.querySelector('[auth-data-router-outlet]').innerHTML = fullMainPageHtml.querySelector('[auth-data-router-outlet]').innerHTML;
       }
 
       if (matchedRoute.path != '/') {
@@ -57,15 +57,75 @@ class Router {
     }
 
     if (this.chatSocket == undefined && this.authRes) {
-      this.chatSocket = await ChatSocket.create()
+      this.chatSocket = await ChatSocket.create();
     }
 
     if (matchedRoute.path == '/chat/:userid' && this.chatSocket != undefined && this.authRes) {
-      let func = this.chatSocket.keypress
+      let chat = document.querySelector("#chat-log");
+      this.chatSocket.chat = chat;
+      let func = this.chatSocket.keypress;
       let funcBind = func.bind(this.chatSocket);
       routerOutletElement.querySelector(".chat-textarea").addEventListener("keypress", function (event) {
         funcBind(event, parseInt(urlSegments[1]))
-      }.bind(funcBind))
+      }.bind(funcBind));
+
+      let pageBind = this.chatSocket.currentChatPage
+      let currentPageIsLastBind = this.chatSocket.currentPageIsLast
+      
+      let loadNewMessages = _.throttle(async function () {
+        if (chat.scrollTop < 200 && !currentPageIsLastBind) {
+          let prevScrollHeight = chat.scrollHeight;
+          let prevScrollTop = chat.scrollTop;
+
+          pageBind++;
+          let newFormData = new FormData
+          newFormData.append("secondUserId", parseInt(urlSegments[1]))
+          newFormData.append("page", pageBind)
+
+          await fetch('/get-chat', { method: "post", body: newFormData }).then(res => res.json()).then(res => {
+            if (res.ok == false) {
+              GenerateAlert("Error with getting chat messages", "error");
+            } else {
+              res.forEach(message => {
+                let myMessage = document.createElement("div");
+                let hisMessage = document.createElement("div");
+                hisMessage.classList.add("chat-log-item", "chat-log-item-own")
+                myMessage.classList.add("chat-log-item")
+
+                if (message.fromUserId == parseInt(urlSegments[1])) {
+                  hisMessage.innerHTML = `
+                    <div class="chat-log-message-header">
+                      <h3>Max Paine</h3>
+                    </div>
+                    <div class="chat-log-message">${message.message}</div>
+                    <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+                  `
+                  chat.insertBefore(hisMessage, chat.firstChild);
+                } else {
+                  myMessage.innerHTML = `
+                    <div class="chat-log-message-header">
+                      <h3>Qwerty</h3>
+                    </div>
+                    <div class="chat-log-message">${message.message}</div>
+                    <p class="chat-log-date mb-0 mt-3 font-weight-light">${getTime(message.created)}</p>
+                  `
+                  chat.insertBefore(myMessage, chat.firstChild);
+                }
+              })
+            }
+
+            if (res.length < 10 || res.length == undefined) {
+              chat.removeEventListener("scroll", loadNewMessages);
+              currentPageIsLastBind = true;
+            }
+          });
+
+          chat.scrollTop = chat.scrollHeight - prevScrollHeight + prevScrollTop;
+        }
+      }, 300);
+
+      chat.addEventListener("scroll", loadNewMessages);
+      chat.scrollTop = chat.scrollHeight;
     }
 
     routerOutletElement.classList.remove("hide")
