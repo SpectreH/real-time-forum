@@ -342,11 +342,34 @@ func (m *sqliteDBRepo) GetUserName(id int) (string, error) {
 }
 
 // GetUserList gets all users id and username
-func (m *sqliteDBRepo) GetUserList() ([]models.Chatter, error) {
+func (m *sqliteDBRepo) GetUserList(id int) ([]models.Chatter, error) {
 	res := []models.Chatter{}
 
-	sqlStmt := `SELECT id, username FROM users ORDER BY username;`
-	rows, err := m.DB.Query(sqlStmt)
+	sqlStmt := `
+	SELECT id, username FROM
+	(SELECT * FROM
+	(SELECT * FROM 
+	(SELECT users.id, users.username, messages.created FROM users 
+	LEFT join messages on 
+	(users.id = messages.from_user_id or users.id = messages.to_user_id) AND 
+	(messages.from_user_id = $1 or messages.to_user_id = $1) 
+	WHERE messages.created IS NOT NULL 
+	ORDER BY messages.created DESC) 
+	GROUP BY username)
+	ORDER BY created DESC)
+
+	UNION ALL 
+
+	SELECT id, username FROM 
+	(SELECT  users.id, users.username, messages.created FROM users
+	LEFT join messages on 
+	(users.id = messages.from_user_id or users.id = messages.to_user_id) AND 
+	(messages.from_user_id = $1 or messages.to_user_id = $1)
+	WHERE messages.created IS NULL
+	GROUP BY username)
+	`
+
+	rows, err := m.DB.Query(sqlStmt, id)
 
 	if err != nil {
 		return res, err

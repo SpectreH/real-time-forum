@@ -63,6 +63,7 @@ class Router {
     if (matchedRoute.path == '/chat/:userid' && this.chatSocket != undefined && this.authRes) {
       this.chatSocket.currentChatPage = 0;
       this.chatSocket.offsetToApply = 10;
+      this.chatSocket.currentPageIsLast = false;
       this.chatSocket.chat = document.querySelector("#chat-log");
 
       let func = this.chatSocket.keypress;

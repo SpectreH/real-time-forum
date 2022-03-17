@@ -117,9 +117,9 @@ header button {
   fill: #c9c3c3;
 }
 
-.user-offline a {
+/* .user-offline a {
   display: none;
-}
+} */
 
 @media (max-width: 991.98px) {
   .offcanvas-collapse {

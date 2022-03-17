@@ -49,7 +49,7 @@ func (sr *SocketReader) AppendNewConnection(conn *websocket.Conn, name string, i
 
 // setUserList gets all registered users and sets their current status (online/offline)
 func (sr *SocketReader) setUserList() ([]models.Chatter, error) {
-	chatters, err := sr.db.GetUserList()
+	chatters, err := sr.db.GetUserList(sr.id)
 	if err != nil {
 		log.Println(err)
 		sr.closeConnection()

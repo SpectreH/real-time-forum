@@ -19,6 +19,17 @@ class ChatSocket {
     return o;
   }
 
+  updateUserList(data) {
+    let userElement;
+    if (data.fromUserId == this.myself.id) {
+      userElement = this.userList.querySelector(`#user-${data.toUserId}`)
+    } else {
+      userElement = this.userList.querySelector(`#user-${data.fromUserId}`)
+    }
+    userElement.remove()
+    this.userList.insertBefore(userElement, this.userList.firstChild);
+  }
+
   loadUserList(users) {
     users.forEach(user => {
       let element = document.createElement("div");
@@ -65,7 +76,11 @@ class ChatSocket {
   }
 
   showMessage(text) {
-    let userName;
+    this.updateUserList(text)
+    if ((!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${text.fromUserId}`) && text.fromUserId != this.myself.id) {
+      return
+    }
+
     let timeInLocalTimeZone = new Date(new Date().setHours(new Date().getHours() + 2));
     let messageHTML = document.createElement("div");
     let changeScroll = false;

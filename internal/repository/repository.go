@@ -21,6 +21,6 @@ type DatabaseRepo interface {
 	GetPostComments(postId int) ([]models.PostComment, error)
 	GetUserHash(id int) (string, error)
 	GetUserName(id int) (string, error)
-	GetUserList() ([]models.Chatter, error)
+	GetUserList(id int) ([]models.Chatter, error)
 	GetMessages(firstUserId int, secondUserId int, page int, offset int) ([]models.Message, error)
 }
