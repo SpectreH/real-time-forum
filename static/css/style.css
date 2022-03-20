@@ -192,3 +192,43 @@ header button {
   font-size: small;
   color: rgb(134, 134, 134);
 }
+
+/* Alert Section */
+.page-alert {
+  max-width: 400px;
+  position: fixed;
+  right: 20px;
+  bottom: 50px;
+  z-index: 500;
+}
+
+.alert {
+  padding: 26px 32px 16px;
+  display: block;
+  border-radius: 8px;
+  border: 2px solid rgba(23, 160, 23, 0.65);
+  background-color: rgba(23, 160, 23, 0.65);
+}
+
+.alert-text {
+  text-align: center;  
+  font-size: 20px;
+  color: white;
+  margin: 0;
+  margin-right: 15px;
+}
+
+.page-alert-close {
+  position: absolute;
+  text-align: center;
+  top: 7px;
+  right: 7px;
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: opacity .3s ease;
+  fill: white;
+} 

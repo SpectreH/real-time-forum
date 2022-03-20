@@ -25,6 +25,7 @@ func (m *Repository) PostRegister(w http.ResponseWriter, r *http.Request) {
 
 		res, err := m.DB.CheckUsernameExistence(user.UserName)
 		if res != 0 || err != nil {
+			models.GlobalData.Error = "This username already taken"
 			log.Println(err)
 			http.Redirect(w, r, "/registration", http.StatusFound)
 			return
@@ -32,6 +33,7 @@ func (m *Repository) PostRegister(w http.ResponseWriter, r *http.Request) {
 
 		res, err = m.DB.CheckEmailExistence(user.Email)
 		if res != 0 || err != nil {
+			models.GlobalData.Error = "This email already registered"
 			log.Println(err)
 			http.Redirect(w, r, "/registration", http.StatusFound)
 			return
@@ -45,6 +47,8 @@ func (m *Repository) PostRegister(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/registration", http.StatusFound)
 			return
 		}
+
+		models.GlobalData.Flash = "You successfully registered!"
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)

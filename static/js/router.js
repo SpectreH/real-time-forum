@@ -47,7 +47,7 @@ class Router {
         routerOutletElement.querySelector('[auth-data-router-outlet]').innerHTML = fullMainPageHtml.querySelector('[auth-data-router-outlet]').innerHTML;
       }
 
-      if (matchedRoute.path != '/') {
+      if (matchedRoute.path != '/' && matchedRoute.getTemplate) {
         let mainInnerHTMLRouter = routerOutletElement.querySelector('[auth-data-router-outlet]');
         mainInnerHTMLRouter.innerHTML = await matchedRoute.getTemplate(matchedRoute.params);
       } 
@@ -119,6 +119,8 @@ class Router {
 
       this.chatSocket.chat.addEventListener("scroll", loadNewMessages);
       this.chatSocket.chat.scrollTop = this.chatSocket.chat.scrollHeight;
+    } else if (this.chatSocket != undefined && this.authRes) {
+      this.chatSocket.chat = null;
     }
 
     routerOutletElement.classList.remove("hide")

@@ -77,6 +77,12 @@ class ChatSocket {
 
   showMessage(text) {
     this.updateUserList(text)
+    if (text.toUserId == this.myself.id) {
+      if (!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${text.fromUserId}`) {
+        GenerateAlertBox("message", `New message from <b>${text.fromUsername}</b>`)
+      }
+    }
+
     if ((!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${text.fromUserId}`) && text.fromUserId != this.myself.id) {
       return
     }
