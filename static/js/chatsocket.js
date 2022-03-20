@@ -79,7 +79,19 @@ class ChatSocket {
   }
 
   runTypingEngine(whoIsTyping, fromUserId) {
-    if (!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${fromUserId}` || this.typingInterval != null) { return; }
+    if (!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${fromUserId}`) { return }
+
+    if (this.stopTypingEngineTimeout) {
+      clearTimeout(this.stopTypingEngineTimeout);
+    }
+
+    this.stopTypingEngineTimeout = window.setTimeout(function () {
+      this.stopTypingEngine(fromUserId);
+    }.bind(this), 1500)
+
+    if (this.typingInterval != null) {
+      return;
+    }
 
     this.typingElement = document.querySelector("#real-typing");
     this.typingElement.innerHTML = `${whoIsTyping} is currently typing a message`;
@@ -93,6 +105,7 @@ class ChatSocket {
       return
     }
 
+    clearTimeout(this.stopTypingEngineTimeout);
     clearTimeout(this.typingInterval);
     this.typingInterval = null;
     this.typingElement.innerHTML = "";
@@ -119,8 +132,6 @@ class ChatSocket {
     if ((!this.chat || this.chat.getAttribute(`data-userid`) != `chat-${text.fromUserId}`) && text.fromUserId != this.myself.id) {
       return
     }
-
-    this.runTypingEngine();
 
     let timeInLocalTimeZone = new Date(new Date().setHours(new Date().getHours() + 2));
     let messageHTML = document.createElement("div");
@@ -191,21 +202,6 @@ class ChatSocket {
     }
 
     this.send(text);
-
-    if (this.stopTypingEngineTimeout) {
-      clearTimeout(this.stopTypingEngineTimeout);
-    }
-
-    this.stopTypingEngineTimeout = window.setTimeout(function () {
-      let text = {
-        type: "end-typing",
-        message: "",
-        fromUserId: this.myself.id,
-        toUserId: toUser
-      }
-
-      this.send(text);
-    }.bind(this), 1500, toUser)
   }
 
   async connectSocket() {
