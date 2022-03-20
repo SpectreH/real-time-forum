@@ -251,9 +251,10 @@ const routes = [
         <div class="border-bottom pb-2 mb-0 d-flex">
           <h6 class="">Chat</h6>
         </div>
-        <div id="category-list">
+        <div>
           <div class="chat-log" id="chat-log" data-userid="chat-${params.userid}">
           </div>
+          <p class="mb-2" id="real-typing" style="color: gray;"></p>
           <div class="input-group">
             <textarea class="chat-textarea form-control" placeholder="Type your message here" aria-label="Chat textarea"></textarea>
           </div>

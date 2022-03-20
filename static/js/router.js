@@ -123,6 +123,10 @@ class Router {
       this.chatSocket.chat = null;
     }
 
+    if (this.chatSocket != undefined && this.authRes) {
+      this.chatSocket.stopTypingEngine(-1);
+    }
+
     routerOutletElement.classList.remove("hide")
     this.formValidation();
   }

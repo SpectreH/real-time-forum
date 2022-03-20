@@ -165,11 +165,13 @@ func (sr *SocketReader) read() {
 		return
 	}
 
-	err = sr.db.InsertMessage(message)
-	if err != nil && err != sql.ErrNoRows {
-		log.Println(err)
-		sr.closeConnection()
-		return
+	if message.Type != "start-typing" && message.Type != "end-typing" {
+		err = sr.db.InsertMessage(message)
+		if err != nil && err != sql.ErrNoRows {
+			log.Println(err)
+			sr.closeConnection()
+			return
+		}
 	}
 
 	message.FromUsername, err = sr.db.GetUserName(message.FromUserID)
